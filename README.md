@@ -1,2 +1,4 @@
 # Unifranz-Nigthmare
 *Grupo chochocs*  Aldo Michael Figueredo-Sebastián Ariel Camacho Loayza-Yuri Rojas Catunta-Brian Rivas Navas
+es un juego de terror y supervivencia 2D inspirado en la mecánica de Five Nights at Freddy's, pero ambientado en la realizacion de un proyecto para la Unifranz. El jugador debe sobrevivir turnos nocturnos mientras evita ser sorprendido usando IA para la realizacion de sus trabajos, los docentes van rotando tiempos y dependiendo el uso prologado de los distintos chats de ia que utilice para hacer su proyecto, los castigos van desde sustos, decomisacion, penalizaciones etc
+Terror / Supervivencia / Point-and-Click 2D
