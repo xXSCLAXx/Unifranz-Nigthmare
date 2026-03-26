@@ -18,21 +18,20 @@ Integrantes del Equipo
 
 Yuri Rojas — Game Designer / Lider de proyecto Aldo Michael — Programador principal Sebastian Camacho — Arte y assets Bryan Rivas — Programador / Git Manager
 
-Instrucciones para Ejecutar el Proyecto Requisitos previos
 
-Unity Hub instalado
-Unity 2022.x LTS instalado (con modulo Windows Build Support)
-Git instalado
+INSTRUCCIONES PARA EJECUTAR EL PROYECTO
+Requisitos previos
+- Unity Hub instalado
+- Unity *2022.x LTS* instalado (con módulo *Windows Build Support*)
+- Git instalado
+
 Pasos
-
-Clonar el repositorio:git clone https://github.com/xXSCLAXx/Unifranz-Nigthmare
-Abrir Unity Hub.
-Hacer clic en "Add project from disk" y seleccionar la carpeta clonada.
-Esperar a que Unity importe todos los assets.
-Abrir la escena principal desde Assets/Scenes/MainMenu.unity
-Presionar Play para ejecutar el juego en el editor.
-Estructura del Proyecto unifranz-nightmares/ Assets/ Scenes/ Scripts/ Sprites/ Audio/ Prefabs/ UI/ Packages/ ProjectSettings/ README.md BITACORA.md
-
-Estado del Proyecto Prototipo en desarrollo — fase inicial. [x] Idea definida [x] Repositorio creado [x] Estructura base del proyecto subida
-
-Licencia Este proyecto fue desarrollado con fines academicos para la asignatura PGM-611 — Universidad Unifranz.
+1. Clona el repositorio:
+   bash
+   git clone https://github.com/TU_USUARIO/unifranz-nightmares.git
+2. Abre *Unity Hub*
+3. Haz clic en *"Add project from disk"* y selecciona la carpeta clonada
+4. Espera a que Unity importe todos los assets
+5. Abre la escena principal desde:
+   Assets/Scenes/MainMenu.unity
+6. Presiona *Play* para ejecutar el juego en el editor
