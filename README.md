@@ -1,5 +1,9 @@
 Grupo Chochocs presenta un videojuego de terror y supervivencia en 2D, inspirado en la mecánica de Five Nights at Freddy’s, pero con una ambientación original centrada en la vida universitaria dentro de la Unifranz.
+
 En este juego, el jugador asume el rol de un estudiante que debe sobrevivir a turnos nocturnos mientras desarrolla su proyecto académico. Durante la noche, deberá evitar ser descubierto utilizando herramientas de inteligencia artificial, ya que los docentes patrullan constantemente y reaccionan ante el uso indebido de estas tecnologías.
+
 El sistema de juego se basa en la gestión estratégica del tiempo y los recursos. El jugador podrá monitorear cámaras de seguridad para rastrear la ubicación de los docentes, cerrar puertas, activar mecanismos de defensa y tomar decisiones rápidas para evitar ser sorprendido.
+
 A medida que el uso de herramientas de IA aumenta, también lo hacen las consecuencias. Los castigos pueden variar desde sustos inesperados hasta penalizaciones académicas o incluso la confiscación del trabajo, lo que incrementa la tensión y el desafío del juego.
+
 Clasificado dentro del género Survival Horror 2D, el juego combina elementos de suspenso, estrategia y administración de recursos, ofreciendo una experiencia inmersiva donde cada decisión puede marcar la diferencia entre avanzar o fracasar.
