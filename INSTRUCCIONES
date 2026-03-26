@@ -1,0 +1,25 @@
+Instrucciones para Ejecutar el Proyecto
+ 
+### Requisitos previos
+- Unity Hub instalado
+- Unity *2022.x LTS* instalado (con módulo *Windows Build Support*)
+- Git instalado
+
+### Pasos
+ 
+1. Clona el repositorio:
+   bash
+   git clone https://github.com/TU_USUARIO/unifranz-nightmares.git
+   
+2. Abre *Unity Hub*
+ 
+3. Haz clic en *"Add project from disk"* y selecciona la carpeta clonada
+ 
+4. Espera a que Unity importe todos los assets
+ 
+5. Abre la escena principal desde:
+   
+   Assets/Scenes/MainMenu.unity
+   
+ 
+6. Presiona *Play* para ejecutar el juego en el editor
