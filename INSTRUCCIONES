@@ -11,7 +11,6 @@ Instrucciones para Ejecutar el Proyecto
    bash
    git clone https://github.com/TU_USUARIO/unifranz-nightmares.git
    
- 
 2. Abre *Unity Hub*
  
 3. Haz clic en *"Add project from disk"* y selecciona la carpeta clonada
