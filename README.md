@@ -19,7 +19,9 @@ Integrantes del Equipo
 Yuri Rojas — Game Designer / Lider de proyecto Aldo Michael — Programador principal Sebastian Camacho — Arte y assets Bryan Rivas — Programador / Git Manager
 
 
+
 INSTRUCCIONES PARA EJECUTAR EL PROYECTO
+
 Requisitos previos
 - Unity Hub instalado
 - Unity *2022.x LTS* instalado (con módulo *Windows Build Support*)
