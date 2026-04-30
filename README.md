@@ -3,7 +3,7 @@ FNaF Panorama Ported To Unity
 # Instruction
 -Select Your Current Camera
 -Define your character
--play the videogame
+-play the videogamegit 
 
 -And Done
 
