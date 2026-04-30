@@ -2,7 +2,8 @@
 FNaF Panorama Ported To Unity
 # Instruction
 -Select Your Current Camera
-
+-Define your character
+-play the videogame
 -Add "Panorama Effect" Script On Your Camera
 
 -And Done
