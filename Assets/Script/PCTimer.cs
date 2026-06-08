@@ -8,6 +8,7 @@ public class PCTimer : MonoBehaviour
     public Text timerText;
 
     private static int consecutiveScares = 0;
+    public static float bonusTime = 0f;
 
     private float tiempoRestante;
     private bool corriendo = false;
@@ -29,7 +30,7 @@ public class PCTimer : MonoBehaviour
         float penalty = 0f;
         for (int i = 0; i < consecutiveScares; i++)
             penalty += 1.0f + i * 0.7f;
-        return Mathf.Max(1f, 10f - penalty);
+        return Mathf.Max(1f, 10f - penalty + bonusTime);
     }
 
     void Update()

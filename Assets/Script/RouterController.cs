@@ -1,9 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
 public class RouterController : MonoBehaviour
 {
     public static bool IsOpen { get; private set; }
+    public static bool wifiFixed = false;
+
     private GameObject panel;
     private GameObject blocker;
     private GameObject frontView;
@@ -20,12 +23,34 @@ public class RouterController : MonoBehaviour
     private bool wifiRestarted = false;
     private float blinkTimer = 0f;
 
+    private static bool firstTimeRewardGiven = false;
+
+    private static bool wifiBrokenAgain = false;
+    private static float brokenTimer = 0f;
+    private GameObject alertOverlay;
+    private GameObject screamerObj;
+    private RawImage screamerRaw;
+    private AudioSource alarmSource;
+    private AudioClip alarmClip;
+    private VideoPlayer videoPlayer;
+    private bool screamerShowing = false;
+    private float screamerTimer = 0f;
+
+    private Transform canvasRoot;
+
     void Awake()
     {
+        canvasRoot = transform.parent;
+        alarmClip = Resources.Load<AudioClip>("Audio/wifi_alarm");
+
         CreateBlocker();
         CreatePanel();
+        CreateAlertOverlay();
+        CreateScreamer();
         panel.SetActive(false);
         blocker.SetActive(false);
+        alertOverlay.SetActive(false);
+        screamerObj.SetActive(false);
     }
 
     void CreateBlocker()
@@ -40,6 +65,53 @@ public class RouterController : MonoBehaviour
         Image bg = blocker.AddComponent<Image>();
         bg.color = new Color(0f, 0f, 0f, 0.4f);
         bg.raycastTarget = true;
+    }
+
+    void CreateAlertOverlay()
+    {
+        alertOverlay = new GameObject("AlertOverlay");
+        alertOverlay.transform.SetParent(canvasRoot, false);
+        RectTransform aRt = alertOverlay.AddComponent<RectTransform>();
+        aRt.anchorMin = Vector2.zero;
+        aRt.anchorMax = Vector2.one;
+        aRt.sizeDelta = Vector2.zero;
+        aRt.anchoredPosition = Vector2.zero;
+        Image alertImg = alertOverlay.AddComponent<Image>();
+        alertImg.color = new Color(0.6f, 0f, 0f, 0f);
+        alertImg.raycastTarget = false;
+    }
+
+    void CreateScreamer()
+    {
+        screamerObj = new GameObject("ScreamerVideo");
+        screamerObj.transform.SetParent(canvasRoot, false);
+        RectTransform sRt = screamerObj.AddComponent<RectTransform>();
+        sRt.anchorMin = Vector2.zero;
+        sRt.anchorMax = Vector2.one;
+        sRt.sizeDelta = Vector2.zero;
+        sRt.anchoredPosition = Vector2.zero;
+
+        screamerRaw = screamerObj.AddComponent<RawImage>();
+        screamerRaw.color = Color.white;
+        screamerRaw.raycastTarget = false;
+
+        RenderTexture rt = new RenderTexture(Screen.width, Screen.height, 24);
+        rt.Create();
+
+        videoPlayer = screamerObj.AddComponent<VideoPlayer>();
+        videoPlayer.playOnAwake = false;
+        videoPlayer.isLooping = false;
+        videoPlayer.skipOnDrop = true;
+        videoPlayer.source = VideoSource.VideoClip;
+        VideoClip vc = Resources.Load<VideoClip>("Video/screamer_wifi");
+        if (vc == null)
+            vc = Resources.Load<VideoClip>("screamer_wifi");
+        videoPlayer.clip = vc;
+        videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
+        videoPlayer.renderMode = VideoRenderMode.RenderTexture;
+        videoPlayer.targetTexture = rt;
+
+        screamerRaw.texture = rt;
     }
 
     void CreatePanel()
@@ -418,9 +490,51 @@ public class RouterController : MonoBehaviour
 
     void Update()
     {
-        if (panel == null || !panel.activeSelf) return;
+        if (panel == null) return;
 
-        if (!showingBack && !wifiRestarted)
+        if (screamerShowing)
+        {
+            screamerTimer -= Time.deltaTime;
+            if (screamerTimer <= 0f)
+            {
+                screamerShowing = false;
+                if (videoPlayer != null && videoPlayer.isPlaying)
+                    videoPlayer.Stop();
+                screamerObj.SetActive(false);
+            }
+        }
+
+        if (wifiBrokenAgain)
+        {
+            float pulseAlpha = Mathf.Abs(Mathf.Sin(Time.time * 2f)) * 0.3f;
+            Image alertImg = alertOverlay.GetComponent<Image>();
+            if (alertImg != null)
+                alertImg.color = new Color(0.6f, 0f, 0f, pulseAlpha);
+
+            brokenTimer -= Time.deltaTime;
+
+            if (brokenTimer <= 0f)
+            {
+                wifiBrokenAgain = false;
+                TriggerScreamer();
+            }
+        }
+
+        if (wifiRestarted && !wifiBrokenAgain && !panel.activeSelf && Input.GetMouseButtonDown(0))
+        {
+            if (Random.value < 0.5f)
+            {
+                wifiBrokenAgain = true;
+                wifiFixed = false;
+                TaskNotesController.wifiFixed = false;
+                brokenTimer = 15f;
+                alertOverlay.transform.SetAsLastSibling();
+                alertOverlay.SetActive(true);
+                StartAlarm();
+            }
+        }
+
+        if (panel.activeSelf && !showingBack && !wifiRestarted)
         {
             if (powerOn)
             {
@@ -433,7 +547,7 @@ public class RouterController : MonoBehaviour
                 btnPowerImg.color = new Color(0.3f, 0.05f, 0.05f, 0.5f);
             }
         }
-        else if (!showingBack && wifiRestarted)
+        else if (panel.activeSelf && !showingBack && wifiRestarted)
         {
             btnPowerImg.color = new Color(0.05f, 0.6f, 0.05f, 1f);
             btnPowerText.text = "LISTO";
@@ -456,7 +570,22 @@ public class RouterController : MonoBehaviour
             return;
         }
         wifiRestarted = true;
+        wifiFixed = true;
         TaskNotesController.wifiFixed = true;
+
+        if (!firstTimeRewardGiven)
+        {
+            firstTimeRewardGiven = true;
+            PCTimer.bonusTime += 1f;
+        }
+
+        if (wifiBrokenAgain)
+        {
+            wifiBrokenAgain = false;
+            StopAlarm();
+            alertOverlay.SetActive(false);
+        }
+
         statusText.text = "WiFi reiniciado correctamente!";
         btnPowerText.text = "LISTO";
         btnPowerImg.color = new Color(0.05f, 0.6f, 0.05f, 1f);
@@ -469,14 +598,101 @@ public class RouterController : MonoBehaviour
         switchText.color = powerOn ? new Color(0.2f, 1f, 0.2f) : new Color(1f, 0.3f, 0.3f);
     }
 
+    void StartAlarm()
+    {
+        if (alarmSource == null)
+        {
+            alarmSource = gameObject.AddComponent<AudioSource>();
+            alarmSource.loop = true;
+            alarmSource.volume = 0.6f;
+        }
+        if (alarmClip == null)
+        {
+            AudioClip loaded = Resources.Load<AudioClip>("Audio/wifi_alarms");
+            if (loaded != null)
+            {
+                int sr = loaded.frequency;
+                int channels = loaded.channels;
+                int startSample = sr * 1;
+                int endSample = sr * 9;
+                int len = endSample - startSample;
+                float[] fullData = new float[loaded.samples * channels];
+                loaded.GetData(fullData, 0);
+                float[] trimData = new float[len * channels];
+                for (int i = 0; i < trimData.Length; i++)
+                    trimData[i] = fullData[startSample * channels + i];
+                alarmClip = AudioClip.Create("alarm_trim", len, channels, sr, false);
+                alarmClip.SetData(trimData, 0);
+            }
+            if (alarmClip == null)
+            {
+                int sr = 44100;
+                int len = sr * 8;
+                float[] wave = new float[len];
+                for (int i = 0; i < len; i++)
+                    wave[i] = Mathf.Sin(2 * Mathf.PI * 880 * i / sr);
+                alarmClip = AudioClip.Create("beep", len, 1, sr, false);
+                alarmClip.SetData(wave, 0);
+            }
+        }
+        alarmSource.clip = alarmClip;
+        alarmSource.Play();
+    }
+
+    void StopAlarm()
+    {
+        if (alarmSource != null && alarmSource.isPlaying)
+            alarmSource.Stop();
+    }
+
+    void TriggerScreamer()
+    {
+        screamerShowing = true;
+        screamerTimer = 3f;
+        screamerObj.transform.SetAsLastSibling();
+        screamerObj.SetActive(true);
+
+        if (videoPlayer != null && videoPlayer.clip != null)
+        {
+            videoPlayer.Play();
+            screamerTimer = Mathf.Max(3f, (float)videoPlayer.clip.length);
+        }
+        else
+        {
+            screamerRaw.color = Color.red;
+        }
+
+        AudioManager am = FindObjectOfType<AudioManager>();
+        if (am != null) am.PlayScream();
+
+        StopAlarm();
+    }
+
     public void Show()
     {
         IsOpen = true;
         blocker.SetActive(true);
+
+        if (wifiBrokenAgain)
+        {
+            powerOn = false;
+            showingBack = false;
+            wifiRestarted = false;
+            frontView.SetActive(true);
+            backView.SetActive(false);
+            switchText.text = "OFF";
+            switchText.color = new Color(1f, 0.3f, 0.3f);
+            btnPowerText.text = "REINICIAR";
+            btnPowerImg.color = new Color(0.3f, 0.05f, 0.05f, 0.5f);
+            statusText.text = "Conecta la corriente en la parte de atras";
+            panel.SetActive(true);
+            return;
+        }
+
         if (wifiRestarted)
         {
             panel.SetActive(true);
-            statusText.text = "WiFi ya reiniciado!";
+            statusText.text = "WiFi funcionando!";
             btnPowerText.text = "LISTO";
             btnPowerImg.color = new Color(0.05f, 0.6f, 0.05f, 1f);
             frontView.SetActive(true);
@@ -484,6 +700,7 @@ public class RouterController : MonoBehaviour
             showingBack = false;
             return;
         }
+
         powerOn = false;
         showingBack = false;
         frontView.SetActive(true);
