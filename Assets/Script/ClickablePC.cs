@@ -16,11 +16,28 @@ public class ClickablePC : MonoBehaviour
             Debug.Log("Click: " + mouse);
 
             // PC
-            if (mouse.x > 620 && mouse.x < 720 && mouse.y > 240 && mouse.y < 320)
+            if (mouse.x > 720 && mouse.x < 825 && mouse.y > 270 && mouse.y < 370)
             {
                 AudioManager am = FindObjectOfType<AudioManager>();
                 if (am != null) am.PlayClickPC();
                 pcWindow.SetActive(true);
+            }
+
+            // Notes / Task screen (post-it)
+            if (mouse.x > 830 && mouse.x < 995 && mouse.y > 310 && mouse.y < 450)
+            {
+                AudioManager am = FindObjectOfType<AudioManager>();
+                if (am != null) am.PlayClickPC();
+                TaskNotesController notes = FindObjectOfType<TaskNotesController>();
+                if (notes == null)
+                {
+                    Canvas canvas = FindObjectOfType<Canvas>();
+                    if (canvas == null) return;
+                    GameObject go = new GameObject("TaskNotesController");
+                    go.transform.SetParent(canvas.transform, false);
+                    notes = go.AddComponent<TaskNotesController>();
+                }
+                notes.Show();
             }
 
             // Puerta derecha

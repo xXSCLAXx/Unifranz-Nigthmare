@@ -930,4 +930,8 @@ public class PCWindowController : MonoBehaviour
         GetComponent<Image>().raycastTarget = false;
         gameObject.SetActive(false);
     }
+
+    public static int GetModuleCount() { return tasks?.Count ?? 0; }
+    public static bool IsModuleCompleted(int index) { return tasks != null && index >= 0 && index < tasks.Count && tasks[index].completed; }
+    public static string GetModuleName(int index) { return tasks != null && index >= 0 && index < tasks.Count ? tasks[index].name : ""; }
 }
