@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class PCTimer : MonoBehaviour
 {
@@ -8,17 +7,16 @@ public class PCTimer : MonoBehaviour
     public GameObject jumpScareImage;
     public Text timerText;
 
-    [Header("Config")]
-    public float tiempoLimite = 20f;
+    private static int consecutiveScares = 0;
 
     private float tiempoRestante;
     private bool corriendo = false;
 
-    void OnEnable()
+    void Awake()
     {
-        tiempoRestante = tiempoLimite;
-        corriendo = true;
-        StartCoroutine(Contar());
+        tiempoRestante = GetTimeLimit();
+        if (timerText != null)
+            timerText.gameObject.SetActive(false);
     }
 
     void OnDisable()
@@ -26,32 +24,65 @@ public class PCTimer : MonoBehaviour
         corriendo = false;
     }
 
-    IEnumerator Contar()
+    float GetTimeLimit()
     {
-        while (tiempoRestante > 0 && corriendo)
+        float penalty = 0f;
+        for (int i = 0; i < consecutiveScares; i++)
+            penalty += 1.0f + i * 0.7f;
+        return Mathf.Max(1f, 10f - penalty);
+    }
+
+    void Update()
+    {
+        if (!corriendo) return;
+        if (tiempoRestante <= 0f) return;
+
+        tiempoRestante -= Time.deltaTime;
+
+        if (timerText != null)
         {
-            tiempoRestante -= Time.deltaTime;
+            if (tiempoRestante <= 5f)
+                timerText.color = Color.red;
+            else
+                timerText.color = Color.white;
 
-            if (timerText != null)
-            {
-                if (tiempoRestante <= 10f)
-                    timerText.color = Color.red;
-                else
-                    timerText.color = Color.white;
-
-                timerText.text = "⚠ " + Mathf.CeilToInt(tiempoRestante) + "s";
-            }
-
-            yield return null;
+            timerText.text = "⚠ " + Mathf.CeilToInt(tiempoRestante) + "s";
         }
 
-        if (corriendo)
+        if (tiempoRestante <= 0f)
+        {
+            corriendo = false;
             MostrarJumpScare();
+        }
+    }
+
+    public void IniciarTimer()
+    {
+        if (corriendo) return;
+        if (tiempoRestante <= 0f) return;
+
+        corriendo = true;
+        if (timerText != null)
+            timerText.gameObject.SetActive(true);
+    }
+
+    public void PausarTimer()
+    {
+        corriendo = false;
+    }
+
+    public void ResetTimer()
+    {
+        corriendo = false;
+        tiempoRestante = GetTimeLimit();
+        if (timerText != null)
+            timerText.gameObject.SetActive(false);
     }
 
     void MostrarJumpScare()
     {
         corriendo = false;
+        consecutiveScares++;
         if (jumpScareImage != null)
             jumpScareImage.SetActive(true);
         gameObject.SetActive(false);
@@ -60,5 +91,10 @@ public class PCTimer : MonoBehaviour
     public void DetenerTimer()
     {
         corriendo = false;
+    }
+
+    public static bool IsExpired()
+    {
+        return false;
     }
 }

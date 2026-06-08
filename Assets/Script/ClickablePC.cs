@@ -8,6 +8,8 @@ public class ClickablePC : MonoBehaviour
 
     void Update()
     {
+        if (pcWindow.activeSelf) return;
+
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 mouse = Input.mousePosition;
