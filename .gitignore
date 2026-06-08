@@ -1,19 +1,54 @@
-# Unity generated
-[Ll]ibrary/
-[Tt]emp/
-[Oo]bj/
-[Bb]uild/
-[Bb]uilds/
-[Ll]ogs/
-[Uu]ser[Ss]ettings/
-*.pidb.meta
-*.pdb.meta
-*.mdb.meta
-*.unitypackage
-# VS
-.vs/
-*.csproj
+# Standard Unity gitignore
+# =========================
+
+Library/
+Temp/
+Logs/
+*.log
 *.sln
-# OS
+*.csproj
+*.user
+*.userprefs
+*.unityproj
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.mojom
+*.orig
+
+# VS Code
+.vscode/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# macOS
 .DS_Store
+
+# Windows
 Thumbs.db
+
+# Builds
+Build/
+Builds/
+
+# Benchmark reports
+Benchmark/
+
+# Coverage
+Coverage/
+
+# Memory snapshot
+MemoryCaptures/
+
+# Profiler
+ProfilerBurstCompiledAssemblies/
+
+# Asset Store tools
+AssetStoreTools/
+
+# User Settings
+UserSettings/
