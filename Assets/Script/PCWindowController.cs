@@ -486,6 +486,9 @@ public class PCWindowController : MonoBehaviour
             + "<color=#569CD6>Opciones:</color> " + GetAvailableTasksText() + "\n"
             + "<color=#6A9955>Tip: Escribi 'ver codigo' para explorar los archivos.</color>\n";
         chatHistory = chatDisplay.text;
+
+        if (tasks.TrueForAll(t => t.completed))
+            WinScreenController.Show();
     }
 
     string GetRandomCompleteMessage()

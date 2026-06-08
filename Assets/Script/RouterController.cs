@@ -522,7 +522,7 @@ public class RouterController : MonoBehaviour
 
         if (wifiRestarted && !wifiBrokenAgain && !panel.activeSelf && Input.GetMouseButtonDown(0))
         {
-            if (Random.value < 0.5f)
+            if (Random.value < 0.1f)
             {
                 wifiBrokenAgain = true;
                 wifiFixed = false;
@@ -647,6 +647,7 @@ public class RouterController : MonoBehaviour
 
     void TriggerScreamer()
     {
+        GameOverController.LoseLife();
         screamerShowing = true;
         screamerTimer = 3f;
         screamerObj.transform.SetAsLastSibling();

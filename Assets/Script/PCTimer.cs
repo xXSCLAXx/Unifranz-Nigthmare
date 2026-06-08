@@ -82,6 +82,7 @@ public class PCTimer : MonoBehaviour
 
     void MostrarJumpScare()
     {
+        GameOverController.LoseLife();
         corriendo = false;
         consecutiveScares++;
         if (jumpScareImage != null)
