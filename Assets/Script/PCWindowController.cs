@@ -50,7 +50,6 @@ public class PCWindowController : MonoBehaviour
         CreateTaskButtons();
         CreateCodeEditor();
         CreateBackButton();
-        SetupChatScroll();
     }
 
     void InitTasks()
@@ -259,26 +258,14 @@ public class PCWindowController : MonoBehaviour
 
     void SetupChatScroll()
     {
-        if (chatDisplay == null) return;
-        ScrollRect sr = chatDisplay.GetComponentInParent<ScrollRect>();
-        if (sr == null || sr.content == null) return;
-        ContentSizeFitter csf = sr.content.GetComponent<ContentSizeFitter>();
-        if (csf == null)
-            csf = sr.content.gameObject.AddComponent<ContentSizeFitter>();
-        csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        chatDisplay.verticalOverflow = VerticalWrapMode.Truncate;
-        chatDisplay.rectTransform.anchorMin = new Vector2(0, 1);
-        chatDisplay.rectTransform.anchorMax = new Vector2(1, 1);
-        chatDisplay.rectTransform.pivot = new Vector2(0.5f, 1);
-        chatDisplay.rectTransform.sizeDelta = new Vector2(0, 0);
     }
 
     void ScrollChatToBottom()
     {
-        Canvas.ForceUpdateCanvases();
         ScrollRect sr = chatDisplay.GetComponentInParent<ScrollRect>();
-        if (sr != null)
-            sr.verticalNormalizedPosition = 0f;
+        if (sr == null) return;
+        Canvas.ForceUpdateCanvases();
+        sr.verticalNormalizedPosition = 0f;
     }
 
     void CreateTaskButtons()
@@ -349,11 +336,39 @@ public class PCWindowController : MonoBehaviour
 
     void LateUpdate()
     {
-        if (chatDisplay != null && chatDisplay.text != lastChatText)
+        if (chatDisplay == null) return;
+        if (chatDisplay.text == lastChatText) return;
+
+        lastChatText = chatDisplay.text;
+
+        if (chatDisplay.text.Length > 1500)
         {
-            lastChatText = chatDisplay.text;
-            ScrollChatToBottom();
+            string t = chatDisplay.text;
+            int cut = t.Length - 1500;
+            int nl = t.IndexOf('\n', cut);
+            if (nl >= 0)
+                t = t.Substring(nl + 1);
+            else
+                t = t.Substring(cut);
+            if (t.Length > 0)
+            {
+                int searchLen = Mathf.Min(30, t.Length);
+                int anyOpen = t.LastIndexOf('<', searchLen - 1, searchLen);
+                if (anyOpen >= 0 && t.IndexOf('>', anyOpen) < 0)
+                {
+                    int lineEnd = t.IndexOf('\n');
+                    if (lineEnd >= 0)
+                        t = t.Substring(lineEnd + 1);
+                    else
+                        t = "";
+                }
+            }
+            chatDisplay.text = t;
+            chatHistory = t;
+            lastChatText = t;
         }
+
+        ScrollChatToBottom();
     }
 
     void Update()
