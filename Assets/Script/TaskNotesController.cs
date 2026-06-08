@@ -3,17 +3,35 @@ using UnityEngine.UI;
 
 public class TaskNotesController : MonoBehaviour
 {
+    public static bool IsOpen { get; private set; }
     public static bool wifiFixed = false;
     public static bool documentFixed = false;
     public static bool pc4Fixed = false;
 
+    private GameObject blocker;
     private GameObject panel;
     private Text taskListText;
 
     void Awake()
     {
+        CreateBlocker();
         CreatePanel();
         panel.SetActive(false);
+        blocker.SetActive(false);
+    }
+
+    void CreateBlocker()
+    {
+        blocker = new GameObject("Blocker");
+        blocker.transform.SetParent(transform, false);
+        RectTransform bRt = blocker.AddComponent<RectTransform>();
+        bRt.anchorMin = Vector2.zero;
+        bRt.anchorMax = Vector2.one;
+        bRt.sizeDelta = Vector2.zero;
+        bRt.anchoredPosition = Vector2.zero;
+        Image bg = blocker.AddComponent<Image>();
+        bg.color = new Color(0f, 0f, 0f, 0.35f);
+        bg.raycastTarget = true;
     }
 
     void CreatePanel()
@@ -95,12 +113,16 @@ public class TaskNotesController : MonoBehaviour
 
     public void Show()
     {
+        IsOpen = true;
+        blocker.SetActive(true);
         UpdateTaskList();
         panel.SetActive(true);
     }
 
     public void Close()
     {
+        IsOpen = false;
+        blocker.SetActive(false);
         panel.SetActive(false);
     }
 

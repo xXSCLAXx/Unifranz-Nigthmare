@@ -8,7 +8,7 @@ public class ClickablePC : MonoBehaviour
 
     void Update()
     {
-        if (pcWindow.activeSelf) return;
+        if (pcWindow.activeSelf || RouterController.IsOpen || TaskNotesController.IsOpen) return;
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -21,6 +21,23 @@ public class ClickablePC : MonoBehaviour
                 AudioManager am = FindObjectOfType<AudioManager>();
                 if (am != null) am.PlayClickPC();
                 pcWindow.SetActive(true);
+            }
+
+            // Router / WiFi
+            if (mouse.x > 970 && mouse.x < 1070 && mouse.y > 260 && mouse.y < 360)
+            {
+                AudioManager am = FindObjectOfType<AudioManager>();
+                if (am != null) am.PlayClickPC();
+                RouterController router = FindObjectOfType<RouterController>();
+                if (router == null)
+                {
+                    Canvas canvas = FindObjectOfType<Canvas>();
+                    if (canvas == null) return;
+                    GameObject go = new GameObject("RouterController");
+                    go.transform.SetParent(canvas.transform, false);
+                    router = go.AddComponent<RouterController>();
+                }
+                router.Show();
             }
 
             // Notes / Task screen (post-it)
