@@ -106,7 +106,11 @@ public class Aula306Controller : MonoBehaviour
         lBtn.onClick.AddListener(() =>
         {
             if (!TaskNotesController.informeFixed)
+            {
+                InformeController.OnClose += Reopen;
                 InformeController.Show();
+                Close();
+            }
         });
 
         GameObject closeObj = new GameObject("BtnClose");
@@ -145,5 +149,11 @@ public class Aula306Controller : MonoBehaviour
         if (blocker != null) Destroy(blocker);
         panel = null;
         blocker = null;
+    }
+
+    static void Reopen()
+    {
+        InformeController.OnClose -= Reopen;
+        Show();
     }
 }

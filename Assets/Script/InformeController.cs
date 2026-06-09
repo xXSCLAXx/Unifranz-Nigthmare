@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class InformeController : MonoBehaviour
 {
     public static bool IsOpen { get; private set; }
+    public static event System.Action OnClose;
     private static InformeController instance;
     private static Transform canvasRoot;
 
@@ -14,12 +15,21 @@ public class InformeController : MonoBehaviour
     private GameObject contentArea;
 
     private List<ErrorDef> errors = new List<ErrorDef>();
-    private float errorTimer = 0f;
-    private const float ERROR_INTERVAL = 75f;
+    private const float COOLDOWN_TIME = 40f;
+    private const float DANGER_TIME = 45f;
     private bool taskCompleted = false;
+    private int currentActiveErrorIndex = -1;
+    private bool isCooldown = false;
+    private float timerCooldown = 0f;
+    private float timerDanger = 0f;
 
     private GameObject popupPanel;
     private int currentPopupIndex = -1;
+
+    private AudioSource warningSource;
+    private AudioClip warningClip;
+
+    private static bool firstErrorFixed = false;
 
     struct ErrorDef
     {
@@ -54,14 +64,23 @@ public class InformeController : MonoBehaviour
         panel.SetActive(true);
         blocker.SetActive(true);
 
-        panel.transform.SetAsLastSibling();
         blocker.transform.SetAsLastSibling();
-        transform.SetAsLastSibling();
+        panel.transform.SetAsLastSibling();
 
         if (TaskNotesController.informeFixed)
         {
             ShowCompletedState();
             return;
+        }
+
+        if (currentActiveErrorIndex < 0)
+        {
+            PickNextError();
+            if (!taskCompleted)
+            {
+                timerDanger = DANGER_TIME;
+                PlayWarningMusic();
+            }
         }
     }
 
@@ -82,8 +101,8 @@ public class InformeController : MonoBehaviour
         panel = new GameObject("InformePanel");
         panel.transform.SetParent(root, false);
         RectTransform pRt = panel.AddComponent<RectTransform>();
-        pRt.anchorMin = new Vector2(0.05f, 0.05f);
-        pRt.anchorMax = new Vector2(0.95f, 0.95f);
+        pRt.anchorMin = Vector2.zero;
+        pRt.anchorMax = Vector2.one;
         pRt.sizeDelta = Vector2.zero;
 
         Image pBg = panel.AddComponent<Image>();
@@ -115,10 +134,10 @@ public class InformeController : MonoBehaviour
         GameObject closeObj = new GameObject("BtnClose");
         closeObj.transform.SetParent(panel.transform, false);
         RectTransform cRt = closeObj.AddComponent<RectTransform>();
-        cRt.anchorMin = new Vector2(1f, 0.92f);
+        cRt.anchorMin = new Vector2(1f, 1f);
         cRt.anchorMax = new Vector2(1f, 1f);
         cRt.pivot = new Vector2(1f, 1f);
-        cRt.sizeDelta = new Vector2(40f, 40f);
+        cRt.sizeDelta = new Vector2(30f, 30f);
         cRt.anchoredPosition = new Vector2(-5f, -5f);
         Image cImg = closeObj.AddComponent<Image>();
         cImg.color = new Color(0.8f, 0.15f, 0.15f, 0.9f);
@@ -178,11 +197,9 @@ public class InformeController : MonoBehaviour
         CreateDocumentContent();
         CreatePopup();
         InitErrors();
-        ActivateNextErrors();
-        if (PCWindowController.IsModuleCompleted(3))
-            errorTimer = ERROR_INTERVAL / 2f;
-        else
-            errorTimer = ERROR_INTERVAL;
+        isCooldown = false;
+        timerCooldown = 0f;
+        timerDanger = 0f;
     }
 
     void CreateDocumentContent()
@@ -246,11 +263,21 @@ public class InformeController : MonoBehaviour
         popupPanel.transform.SetParent(panel.transform, false);
         popupPanel.SetActive(false);
         RectTransform ppRt = popupPanel.AddComponent<RectTransform>();
-        ppRt.anchorMin = new Vector2(0.25f, 0.3f);
-        ppRt.anchorMax = new Vector2(0.75f, 0.7f);
+        ppRt.anchorMin = new Vector2(0.3f, 0.35f);
+        ppRt.anchorMax = new Vector2(0.7f, 0.65f);
         ppRt.sizeDelta = Vector2.zero;
         Image ppBg = popupPanel.AddComponent<Image>();
-        ppBg.color = new Color(0.15f, 0.15f, 0.2f, 0.95f);
+        ppBg.color = new Color(0.18f, 0.18f, 0.22f, 0.97f);
+
+        GameObject borderObj = new GameObject("Border");
+        borderObj.transform.SetParent(popupPanel.transform, false);
+        RectTransform bRt = borderObj.AddComponent<RectTransform>();
+        bRt.anchorMin = Vector2.zero;
+        bRt.anchorMax = Vector2.one;
+        bRt.sizeDelta = Vector2.zero;
+        Image bImg = borderObj.AddComponent<Image>();
+        bImg.color = new Color(0.35f, 0.35f, 0.45f, 1f);
+        bImg.raycastTarget = false;
 
         GameObject qObj = new GameObject("Question");
         qObj.transform.SetParent(popupPanel.transform, false);
@@ -260,10 +287,10 @@ public class InformeController : MonoBehaviour
         qRt.sizeDelta = Vector2.zero;
         Text qText = qObj.AddComponent<Text>();
         qText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        qText.fontSize = 16;
+        qText.fontSize = 14;
         qText.fontStyle = FontStyle.Bold;
         qText.alignment = TextAnchor.MiddleCenter;
-        qText.color = Color.white;
+        qText.color = new Color(1f, 0.85f, 0.3f);
         qText.text = "Corrige el error:";
 
         for (int i = 0; i < 2; i++)
@@ -272,18 +299,18 @@ public class InformeController : MonoBehaviour
             GameObject optObj = new GameObject("Option" + i);
             optObj.transform.SetParent(popupPanel.transform, false);
             RectTransform oRt = optObj.AddComponent<RectTransform>();
-            oRt.anchorMin = new Vector2(0.1f, 0.05f + i * 0.25f);
-            oRt.anchorMax = new Vector2(0.9f, 0.05f + i * 0.25f + 0.2f);
+            oRt.anchorMin = new Vector2(0.08f, 0.05f + i * 0.22f);
+            oRt.anchorMax = new Vector2(0.92f, 0.05f + i * 0.22f + 0.18f);
             oRt.sizeDelta = Vector2.zero;
             Image oImg = optObj.AddComponent<Image>();
-            oImg.color = new Color(0.3f, 0.3f, 0.4f, 1f);
+            oImg.color = new Color(0.28f, 0.28f, 0.35f, 1f);
             Button oBtn = optObj.AddComponent<Button>();
             oBtn.targetGraphic = oImg;
             ColorBlock cb = new ColorBlock();
-            cb.normalColor = new Color(0.3f, 0.3f, 0.4f, 1f);
-            cb.highlightedColor = new Color(0.4f, 0.4f, 0.5f, 1f);
-            cb.pressedColor = new Color(0.2f, 0.2f, 0.3f, 1f);
-            cb.disabledColor = new Color(0.3f, 0.3f, 0.4f, 0.5f);
+            cb.normalColor = new Color(0.28f, 0.28f, 0.35f, 1f);
+            cb.highlightedColor = new Color(0.4f, 0.45f, 0.55f, 1f);
+            cb.pressedColor = new Color(0.2f, 0.2f, 0.25f, 1f);
+            cb.disabledColor = new Color(0.28f, 0.28f, 0.35f, 0.5f);
             cb.colorMultiplier = 1f;
             cb.fadeDuration = 0.1f;
             oBtn.colors = cb;
@@ -296,7 +323,7 @@ public class InformeController : MonoBehaviour
             oTextRt.sizeDelta = Vector2.zero;
             Text oText = oTextObj.AddComponent<Text>();
             oText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            oText.fontSize = 14;
+            oText.fontSize = 13;
             oText.alignment = TextAnchor.MiddleCenter;
             oText.color = Color.white;
 
@@ -309,7 +336,7 @@ public class InformeController : MonoBehaviour
     {
         errors = new List<ErrorDef>();
 
-        AddError(0, "Integral", "Integrado", "Integro");
+        AddError(0, "Gestion", "Administracion", "Direccion");
         AddError(2, "optimizar", "automatizar", "implementar");
         AddError(2, "eficencia", "eficiencia", "eficacia");
         AddError(2, "garantizar", "asegurar", "descuidar");
@@ -324,8 +351,6 @@ public class InformeController : MonoBehaviour
         AddError(9, "implica", "conlleva", "elimina");
         AddError(9, "desarrollo", "implementacion", "eliminacion");
         AddError(4, "identificar", "detectar", "ocultar");
-
-        errorTimer = 0f;
     }
 
     void AddError(int paragraph, string wrong, string correct, string wrongOpt)
@@ -345,33 +370,149 @@ public class InformeController : MonoBehaviour
     {
         if (!IsOpen || taskCompleted || TaskNotesController.informeFixed) return;
 
-        errorTimer -= Time.deltaTime;
-        if (errorTimer <= 0f)
+        if (isCooldown)
         {
-            ActivateNextErrors();
-            float interval = ERROR_INTERVAL;
-            if (PCWindowController.IsModuleCompleted(3))
-                interval = ERROR_INTERVAL / 2f;
-            errorTimer = interval;
+            timerCooldown -= Time.deltaTime;
+            if (timerCooldown <= 0f)
+            {
+                isCooldown = false;
+                PickNextError();
+                if (!taskCompleted)
+                {
+                    timerDanger = DANGER_TIME;
+                    PlayWarningMusic();
+                }
+            }
+        }
+        else if (currentActiveErrorIndex >= 0)
+        {
+            timerDanger -= Time.deltaTime;
+            if (timerDanger <= 0f && !errors[currentActiveErrorIndex].isFixed)
+            {
+                StartCoroutine(TimeoutGameOver());
+            }
+        }
+        else if (currentActiveErrorIndex < 0 && !taskCompleted)
+        {
+            PickNextError();
+            if (!taskCompleted)
+            {
+                timerDanger = DANGER_TIME;
+                PlayWarningMusic();
+            }
         }
     }
 
-    void ActivateNextErrors()
+    void PlayWarningMusic()
     {
-        int toActivate = PCWindowController.IsModuleCompleted(3) ? 2 : 1;
-        int activated = 0;
-
-        for (int i = 0; i < errors.Count && activated < toActivate; i++)
+        if (warningSource == null)
         {
-            if (!errors[i].isActive && !errors[i].isFixed)
+            warningSource = gameObject.AddComponent<AudioSource>();
+            warningSource.loop = true;
+            warningSource.volume = 0.4f;
+        }
+        if (warningClip == null)
+            StartCoroutine(LoadWarningClip());
+        else if (warningSource != null && !warningSource.isPlaying)
+        {
+            warningSource.clip = warningClip;
+            warningSource.Play();
+        }
+    }
+
+    void StopWarningMusic()
+    {
+        if (warningSource != null && warningSource.isPlaying)
+            warningSource.Stop();
+    }
+
+    IEnumerator LoadWarningClip()
+    {
+        string path = "file:///" + Application.dataPath + "/Audio/warning.wav";
+        using (WWW www = new WWW(path))
+        {
+            yield return www;
+            if (string.IsNullOrEmpty(www.error))
             {
-                var err = errors[i];
-                err.isActive = true;
-                errors[i] = err;
-                HighlightError(i);
-                activated++;
+                warningClip = www.GetAudioClip(false, false, AudioType.WAV);
+                if (warningClip != null && warningSource != null)
+                {
+                    warningSource.clip = warningClip;
+                    warningSource.Play();
+                }
             }
         }
+    }
+
+    IEnumerator TimeoutGameOver()
+    {
+        IsOpen = false;
+        StopWarningMusic();
+        if (panel != null) panel.SetActive(false);
+        if (blocker != null) blocker.SetActive(false);
+
+        GameObject bloodFilter = GameObject.Find("BloodFilter");
+        if (bloodFilter != null) bloodFilter.SetActive(true);
+
+        AudioManager am = FindObjectOfType<AudioManager>();
+        if (am != null) am.PlayScream();
+
+        yield return new WaitForSeconds(0.5f);
+
+        for (int i = 0; i < 3; i++)
+        {
+            GameOverController.LoseLife();
+            if (GameOverController.isGameOver) yield break;
+            yield return new WaitForSeconds(0.3f);
+        }
+    }
+
+    void PickNextError()
+    {
+        if (currentActiveErrorIndex >= 0)
+        {
+            var oldErr = errors[currentActiveErrorIndex];
+            oldErr.isActive = false;
+            errors[currentActiveErrorIndex] = oldErr;
+            ClearHighlight(currentActiveErrorIndex);
+            currentActiveErrorIndex = -1;
+        }
+
+        List<int> candidates = new List<int>();
+        for (int i = 0; i < errors.Count; i++)
+        {
+            if (!errors[i].isFixed)
+                candidates.Add(i);
+        }
+
+        if (candidates.Count == 0)
+        {
+            taskCompleted = true;
+            TaskNotesController.informeFixed = true;
+            ShowCompletedState();
+            return;
+        }
+
+        int pick = candidates[Random.Range(0, candidates.Count)];
+        currentActiveErrorIndex = pick;
+        var err = errors[pick];
+        err.isActive = true;
+        errors[pick] = err;
+        HighlightError(pick);
+    }
+
+    void ClearHighlight(int index)
+    {
+        if (index < 0 || index >= errors.Count) return;
+        var err = errors[index];
+        GameObject parObj = contentArea.transform.Find("Paragraph_" + err.paragraphIndex)?.gameObject;
+        if (parObj == null) return;
+        Text parText = parObj.GetComponent<Text>();
+        if (parText == null) return;
+        string t = parText.text;
+        t = t.Replace("<color=#FF0000>" + err.wrongText + "</color>", err.wrongText);
+        t = t.Replace("<color=#00AA00>" + err.correctText + "</color>", err.wrongText);
+        parText.text = t;
     }
 
     void HighlightError(int index)
@@ -398,25 +539,13 @@ public class InformeController : MonoBehaviour
     void OnParagraphClick(int paragraphIndex)
     {
         if (popupPanel.activeSelf) return;
+        if (currentActiveErrorIndex < 0) return;
 
-        for (int i = 0; i < errors.Count; i++)
+        if (errors[currentActiveErrorIndex].paragraphIndex == paragraphIndex)
         {
-            if (errors[i].paragraphIndex == paragraphIndex && errors[i].isActive && !errors[i].isFixed)
-            {
-                currentPopupIndex = i;
-                ShowPopup(i);
-                return;
-            }
+            currentPopupIndex = currentActiveErrorIndex;
+            ShowPopup(currentActiveErrorIndex);
         }
-    }
-
-    void OnErrorClicked(int index)
-    {
-        if (index < 0 || index >= errors.Count) return;
-        if (errors[index].isFixed || !errors[index].isActive) return;
-
-        currentPopupIndex = index;
-        ShowPopup(index);
     }
 
     void ShowPopup(int index)
@@ -429,8 +558,8 @@ public class InformeController : MonoBehaviour
         if (qText != null)
             qText.text = "Corrige: \"" + err.wrongText + "\"\nCual es la opcion correcta?";
 
-        Text opt0 = popupPanel.transform.Find("Option0")?.GetComponent<Text>();
-        Text opt1 = popupPanel.transform.Find("Option1")?.GetComponent<Text>();
+        Text opt0 = popupPanel.transform.Find("Option0/Text")?.GetComponent<Text>();
+        Text opt1 = popupPanel.transform.Find("Option1/Text")?.GetComponent<Text>();
         if (opt0 != null) opt0.text = "A) " + err.correctText;
         if (opt1 != null) opt1.text = "B) " + err.wrongOption;
     }
@@ -463,6 +592,16 @@ public class InformeController : MonoBehaviour
         err.isActive = false;
         errors[index] = err;
 
+        currentActiveErrorIndex = -1;
+
+        TaskNotesController.documentFixed = true;
+
+        if (!firstErrorFixed)
+        {
+            firstErrorFixed = true;
+            PCTimer.AddBonusTime(2.5f);
+        }
+
         GameObject parObj = contentArea.transform.Find("Paragraph_" + err.paragraphIndex)?.gameObject;
         if (parObj != null)
         {
@@ -475,19 +614,11 @@ public class InformeController : MonoBehaviour
             }
         }
 
-        bool allFixed = true;
-        for (int i = 0; i < errors.Count; i++)
-        {
-            if (!errors[i].isFixed) { allFixed = false; break; }
-        }
-
-        if (allFixed)
-        {
-            taskCompleted = true;
-            TaskNotesController.informeFixed = true;
-            PCTimer.AddBonusTime(2.5f);
-            ShowCompletedState();
-        }
+        isCooldown = true;
+        timerCooldown = COOLDOWN_TIME;
+        if (PCWindowController.IsModuleCompleted(3))
+            timerCooldown = COOLDOWN_TIME / 2f;
+        StopWarningMusic();
     }
 
     void ShowCompletedState()
@@ -514,7 +645,7 @@ public class InformeController : MonoBehaviour
         mText.fontStyle = FontStyle.Bold;
         mText.alignment = TextAnchor.MiddleCenter;
         mText.color = Color.white;
-        mText.text = "INFORME COMPLETADO\n+2.5s al timer";
+        mText.text = "INFORME COMPLETADO";
     }
 
     public void Close()
@@ -522,6 +653,7 @@ public class InformeController : MonoBehaviour
         IsOpen = false;
         if (panel != null) panel.SetActive(false);
         if (blocker != null) blocker.SetActive(false);
+        if (OnClose != null) OnClose();
     }
 
     void OnDestroy()
