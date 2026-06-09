@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -54,6 +53,10 @@ public class InformeController : MonoBehaviour
         IsOpen = true;
         panel.SetActive(true);
         blocker.SetActive(true);
+
+        panel.transform.SetAsLastSibling();
+        blocker.transform.SetAsLastSibling();
+        transform.SetAsLastSibling();
 
         if (TaskNotesController.informeFixed)
         {
@@ -175,6 +178,11 @@ public class InformeController : MonoBehaviour
         CreateDocumentContent();
         CreatePopup();
         InitErrors();
+        ActivateNextErrors();
+        if (PCWindowController.IsModuleCompleted(3))
+            errorTimer = ERROR_INTERVAL / 2f;
+        else
+            errorTimer = ERROR_INTERVAL;
     }
 
     void CreateDocumentContent()
@@ -204,16 +212,31 @@ public class InformeController : MonoBehaviour
             parText.color = new Color(0.1f, 0.1f, 0.12f);
             parText.text = paragraphs[p];
             parText.supportRichText = true;
-            parText.raycastTarget = true;
 
-            EventTrigger trigger = parObj.AddComponent<EventTrigger>();
-            EventTrigger.Entry entry = new EventTrigger.Entry();
-            entry.eventID = EventTriggerType.PointerClick;
-            entry.callback.AddListener((data) => OnParagraphClick(paragraphIndex));
-            trigger.triggers.Add(entry);
+            GameObject clickArea = new GameObject("ClickArea");
+            clickArea.transform.SetParent(parObj.transform, false);
+            RectTransform caRt = clickArea.AddComponent<RectTransform>();
+            caRt.anchorMin = Vector2.zero;
+            caRt.anchorMax = Vector2.one;
+            caRt.sizeDelta = Vector2.zero;
+            Image caImg = clickArea.AddComponent<Image>();
+            caImg.color = new Color(0f, 0f, 0f, 0f);
+            caImg.raycastTarget = true;
+            Button caBtn = clickArea.AddComponent<Button>();
+            caBtn.targetGraphic = caImg;
+            ColorBlock cb2 = new ColorBlock();
+            cb2.normalColor = new Color(0f, 0f, 0f, 0f);
+            cb2.highlightedColor = new Color(1f, 1f, 0f, 0.08f);
+            cb2.pressedColor = new Color(1f, 1f, 0f, 0.15f);
+            cb2.disabledColor = new Color(0f, 0f, 0f, 0f);
+            cb2.colorMultiplier = 1f;
+            cb2.fadeDuration = 0f;
+            caBtn.colors = cb2;
+            caBtn.onClick.AddListener(() => OnParagraphClick(paragraphIndex));
 
-            RectTransform prRt = parObj.GetComponent<RectTransform>();
-            prRt.sizeDelta = new Vector2(0f, 0f);
+            LayoutElement le = parObj.AddComponent<LayoutElement>();
+            le.preferredHeight = -1f;
+            le.flexibleWidth = 1f;
         }
     }
 
@@ -302,7 +325,7 @@ public class InformeController : MonoBehaviour
         AddError(9, "desarrollo", "implementacion", "eliminacion");
         AddError(4, "identificar", "detectar", "ocultar");
 
-        errorTimer = 30f;
+        errorTimer = 0f;
     }
 
     void AddError(int paragraph, string wrong, string correct, string wrongOpt)
