@@ -463,6 +463,16 @@ public class PCWindowController : MonoBehaviour
         }
     }
 
+    public void CancelTask()
+    {
+        if (!isLoading || currentTaskIndex < 0) return;
+        isLoading = false;
+        currentTaskIndex = -1;
+        currentProgress = 0f;
+        PCTimer timer = GetComponent<PCTimer>();
+        if (timer != null) timer.ResetTimer();
+    }
+
     void CompleteCurrentTask()
     {
         if (currentTaskIndex < 0 || currentTaskIndex >= tasks.Count) return;

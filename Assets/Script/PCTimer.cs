@@ -1,12 +1,10 @@
 using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 
 public class PCTimer : MonoBehaviour
 {
     [Header("Refs")]
     public GameObject jumpScareImage;
-    public Text timerText;
 
     private static int consecutiveScares = 0;
     public static float bonusTime = 0f;
@@ -14,12 +12,11 @@ public class PCTimer : MonoBehaviour
     private float tiempoRestante;
     private bool corriendo = false;
     private bool ultimateTriggered = false;
+    private bool pendingDeactivate = false;
 
     void Awake()
     {
         tiempoRestante = GetTimeLimit();
-        if (timerText != null)
-            timerText.gameObject.SetActive(false);
     }
 
     void OnDisable()
@@ -37,22 +34,17 @@ public class PCTimer : MonoBehaviour
 
     void Update()
     {
+        if (pendingDeactivate)
+        {
+            pendingDeactivate = false;
+            gameObject.SetActive(false);
+            return;
+        }
+
         if (!corriendo) return;
         if (tiempoRestante <= 0f) return;
 
         tiempoRestante -= Time.deltaTime;
-
-        if (timerText != null)
-        {
-            if (tiempoRestante <= 5f)
-                timerText.color = Color.red;
-            else if (tiempoRestante <= 40f)
-                timerText.color = new Color(1f, 0.5f, 0f);
-            else
-                timerText.color = Color.white;
-
-            timerText.text = "" + Mathf.CeilToInt(tiempoRestante) + "s";
-        }
 
         if (tiempoRestante <= 0f && !ultimateTriggered)
         {
@@ -64,15 +56,26 @@ public class PCTimer : MonoBehaviour
 
     IEnumerator UltimateScreamerSequence()
     {
-        if (timerText != null)
-            timerText.text = "";
+        PCWindowController pcw = GetComponent<PCWindowController>();
+        if (pcw != null)
+            pcw.CancelTask();
 
-        for (int i = 0; i < 3; i++)
+        if (jumpScareImage != null)
         {
-            GameOverController.LoseLife();
-            if (GameOverController.isGameOver) yield break;
-            yield return new WaitForSeconds(0.3f);
+            jumpScareImage.transform.SetAsLastSibling();
+            jumpScareImage.SetActive(true);
         }
+
+        AudioManager am = FindObjectOfType<AudioManager>();
+        if (am != null) am.PlayScream();
+
+        yield return new WaitForSeconds(0.5f);
+
+        GameOverController.LoseLife();
+
+        yield return new WaitForSeconds(0.3f);
+        if (jumpScareImage != null) jumpScareImage.SetActive(false);
+        pendingDeactivate = true;
     }
 
     public void IniciarTimer()
@@ -81,8 +84,6 @@ public class PCTimer : MonoBehaviour
         if (tiempoRestante <= 0f) return;
 
         corriendo = true;
-        if (timerText != null)
-            timerText.gameObject.SetActive(true);
     }
 
     public void PausarTimer()
@@ -95,8 +96,6 @@ public class PCTimer : MonoBehaviour
         corriendo = false;
         tiempoRestante = GetTimeLimit();
         ultimateTriggered = false;
-        if (timerText != null)
-            timerText.gameObject.SetActive(false);
     }
 
     public static void AddBonusTime(float seconds)

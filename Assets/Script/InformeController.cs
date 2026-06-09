@@ -27,7 +27,6 @@ public class InformeController : MonoBehaviour
     private int currentPopupIndex = -1;
 
     private GameObject alertOverlay;
-    private Text alertTimerText;
 
     private AudioSource warningSource;
     private AudioClip warningClip;
@@ -388,8 +387,6 @@ public class InformeController : MonoBehaviour
         else if (currentActiveErrorIndex >= 0)
         {
             timerDanger -= Time.deltaTime;
-            if (alertTimerText != null)
-                alertTimerText.text = "DOCUMENTO\n" + Mathf.Ceil(timerDanger).ToString() + "s";
             if (timerDanger <= 0f && !errors[currentActiveErrorIndex].isFixed)
             {
                 ShowGlobalAlert(false);
@@ -466,28 +463,12 @@ public class InformeController : MonoBehaviour
         Image img = alertOverlay.AddComponent<Image>();
         img.color = new Color(1f, 0f, 0f, 0.12f);
         img.raycastTarget = false;
-
-        GameObject tmrObj = new GameObject("TimerText");
-        tmrObj.transform.SetParent(alertOverlay.transform, false);
-        RectTransform tRt = tmrObj.AddComponent<RectTransform>();
-        tRt.anchorMin = new Vector2(0.3f, 0.85f);
-        tRt.anchorMax = new Vector2(0.7f, 0.92f);
-        tRt.sizeDelta = Vector2.zero;
-        alertTimerText = tmrObj.AddComponent<Text>();
-        alertTimerText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        alertTimerText.fontSize = 22;
-        alertTimerText.fontStyle = FontStyle.Bold;
-        alertTimerText.alignment = TextAnchor.MiddleCenter;
-        alertTimerText.color = Color.red;
-        alertTimerText.text = "";
     }
 
     void ShowGlobalAlert(bool show)
     {
         if (alertOverlay == null) CreateGlobalAlert();
         alertOverlay.SetActive(show);
-        if (!show && alertTimerText != null)
-            alertTimerText.text = "";
     }
 
     IEnumerator TimeoutGameOver()

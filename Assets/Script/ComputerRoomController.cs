@@ -9,7 +9,6 @@ public class ComputerRoomController : MonoBehaviour
     public static bool pc4IsBroken = false;
     private static ComputerRoomController instance;
     private static GameObject alertOverlay;
-    private static Text alertTimerText;
     private static AudioSource alarmSource;
     private static AudioClip alarmClip;
     private static float breakTimer = 0f;
@@ -76,20 +75,6 @@ public class ComputerRoomController : MonoBehaviour
         Image aImg = alertOverlay.AddComponent<Image>();
         aImg.color = new Color(1f, 0f, 0f, 0f);
         aImg.raycastTarget = false;
-
-        GameObject timerObj = new GameObject("AlertTimer");
-        timerObj.transform.SetParent(alertOverlay.transform, false);
-        RectTransform timerRt = timerObj.AddComponent<RectTransform>();
-        timerRt.anchorMin = new Vector2(0f, 0.55f);
-        timerRt.anchorMax = new Vector2(1f, 0.65f);
-        timerRt.sizeDelta = Vector2.zero;
-        alertTimerText = timerObj.AddComponent<Text>();
-        alertTimerText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        alertTimerText.fontSize = 28;
-        alertTimerText.fontStyle = FontStyle.Bold;
-        alertTimerText.alignment = TextAnchor.MiddleCenter;
-        alertTimerText.color = Color.red;
-        alertTimerText.text = "";
 
         StartCoroutine(AlertPulse(aImg));
 
@@ -261,7 +246,6 @@ public class ComputerRoomController : MonoBehaviour
         pc4IsBroken = false;
         TaskNotesController.pc4Fixed = true;
         if (alertOverlay != null) alertOverlay.SetActive(false);
-        if (alertTimerText != null) alertTimerText.text = "";
         if (alarmSource != null && alarmSource.isPlaying) alarmSource.Stop();
         if (instance != null && instance.pc4ErrorText != null && instance.pc4ErrorText.gameObject != null)
             instance.pc4ErrorText.text = "";
@@ -306,8 +290,6 @@ public class ComputerRoomController : MonoBehaviour
         if (pc4IsBroken)
         {
             breakTimer -= Time.deltaTime;
-            if (alertTimerText != null)
-                alertTimerText.text = "PC4 CRITICO\n" + Mathf.Ceil(breakTimer).ToString() + "s";
             if (breakTimer <= 0f)
             {
                 pc4IsBroken = false;
