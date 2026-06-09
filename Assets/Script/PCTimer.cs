@@ -75,6 +75,8 @@ public class PCTimer : MonoBehaviour
 
         yield return new WaitForSeconds(0.3f);
         if (jumpScareImage != null) jumpScareImage.SetActive(false);
+        GameObject bloodFilter = GameObject.Find("BloodFilter");
+        if (bloodFilter != null) bloodFilter.SetActive(false);
         pendingDeactivate = true;
     }
 
