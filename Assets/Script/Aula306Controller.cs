@@ -7,7 +7,6 @@ public class Aula306Controller : MonoBehaviour
     private static Aula306Controller instance;
     private GameObject panel;
     private GameObject blocker;
-    private static bool persistentCreated = false;
     private static Transform canvasRoot;
 
     public static void Show()
@@ -82,6 +81,33 @@ public class Aula306Controller : MonoBehaviour
         title.alignment = TextAnchor.MiddleCenter;
         title.color = new Color(1f, 0.8f, 0.2f);
         title.text = "AULA 306";
+
+        GameObject laptopBtn = new GameObject("BtnLaptopInforme");
+        laptopBtn.transform.SetParent(panel.transform, false);
+        RectTransform lRt = laptopBtn.AddComponent<RectTransform>();
+        lRt.anchorMin = new Vector2(0f, 0f);
+        lRt.anchorMax = new Vector2(0f, 0f);
+        lRt.pivot = new Vector2(0.5f, 0.5f);
+        lRt.anchoredPosition = new Vector2(960f, 340f);
+        lRt.sizeDelta = new Vector2(200, 140);
+        Image lImg = laptopBtn.AddComponent<Image>();
+        lImg.color = new Color(1f, 1f, 1f, 0f);
+        lImg.raycastTarget = true;
+        Button lBtn = laptopBtn.AddComponent<Button>();
+        lBtn.targetGraphic = lImg;
+        ColorBlock cb = new ColorBlock();
+        cb.normalColor = new Color(1f, 1f, 1f, 0f);
+        cb.highlightedColor = new Color(1f, 1f, 1f, 0f);
+        cb.pressedColor = new Color(1f, 1f, 1f, 0f);
+        cb.disabledColor = new Color(1f, 1f, 1f, 0f);
+        cb.colorMultiplier = 1f;
+        cb.fadeDuration = 0f;
+        lBtn.colors = cb;
+        lBtn.onClick.AddListener(() =>
+        {
+            if (!TaskNotesController.informeFixed)
+                InformeController.Show();
+        });
 
         GameObject closeObj = new GameObject("BtnClose");
         closeObj.transform.SetParent(panel.transform, false);

@@ -7,6 +7,7 @@ public class TaskNotesController : MonoBehaviour
     public static bool wifiFixed = false;
     public static bool documentFixed = false;
     public static bool pc4Fixed = false;
+    public static bool informeFixed = false;
 
     private GameObject blocker;
     private GameObject panel;
@@ -148,7 +149,12 @@ public class TaskNotesController : MonoBehaviour
             + "  - Recompensa: +2s al timer\n\n"
             + "<b>Documento:</b>\n"
             + "  - Sin riesgo\n"
-            + "  - Solo corregir errores";
+            + "  - Solo corregir errores\n\n"
+            + "<b>Informe:</b>\n"
+            + "  - 1 error cada 75s\n"
+            + "  - Elegir opci�n correcta\n"
+            + "  - Si fallas: -15s al timer\n"
+            + "  - Recompensa: +2.5s al timer";
         RectTransform iRt = infoObj.GetComponent<RectTransform>();
         iRt.anchorMin = new Vector2(0.05f, 0.05f);
         iRt.anchorMax = new Vector2(0.95f, 0.83f);
@@ -266,6 +272,7 @@ public class TaskNotesController : MonoBehaviour
         s += "  " + (wifiFixed ? "[X]" : "[ ]") + " Reinicia el WiFi\n";
         s += "  " + (documentFixed ? "[X]" : "[ ]") + " Corrige el documento\n";
         s += "  " + (pc4Fixed ? "[X]" : "[ ]") + " Arregla la conexion de la PC 4\n";
+        s += "  " + (informeFixed ? "[X]" : "[ ]") + " Corrige el informe\n";
 
         taskListText.text = s;
     }

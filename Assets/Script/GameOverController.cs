@@ -74,10 +74,11 @@ public class GameOverController : MonoBehaviour
             for (int i = 0; i < modCount; i++)
                 if (PCWindowController.IsModuleCompleted(i)) completed++;
 
-            total += 3;
+            total += 4;
             if (TaskNotesController.wifiFixed) completed++;
             if (TaskNotesController.documentFixed) completed++;
             if (TaskNotesController.pc4Fixed) completed++;
+            if (TaskNotesController.informeFixed) completed++;
 
             GameObject infoObj = new GameObject("InfoText");
             infoObj.transform.SetParent(panel.transform, false);

@@ -1,17 +1,22 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class PCTimer : MonoBehaviour
 {
     [Header("Refs")]
     public GameObject jumpScareImage;
     public Text timerText;
+    public AudioClip warningMusicClip;
 
     private static int consecutiveScares = 0;
     public static float bonusTime = 0f;
 
     private float tiempoRestante;
     private bool corriendo = false;
+    private bool warningTriggered = false;
+    private bool ultimateTriggered = false;
+    private AudioSource warningSource;
 
     void Awake()
     {
@@ -40,20 +45,60 @@ public class PCTimer : MonoBehaviour
 
         tiempoRestante -= Time.deltaTime;
 
+        if (!warningTriggered && tiempoRestante <= 40f && tiempoRestante > 0f)
+        {
+            warningTriggered = true;
+            TriggerWarningMusic();
+        }
+
         if (timerText != null)
         {
             if (tiempoRestante <= 5f)
                 timerText.color = Color.red;
+            else if (tiempoRestante <= 40f)
+                timerText.color = new Color(1f, 0.5f, 0f);
             else
                 timerText.color = Color.white;
 
-            timerText.text = "⚠ " + Mathf.CeilToInt(tiempoRestante) + "s";
+            timerText.text = "" + Mathf.CeilToInt(tiempoRestante) + "s";
         }
 
-        if (tiempoRestante <= 0f)
+        if (tiempoRestante <= 0f && !ultimateTriggered)
         {
+            ultimateTriggered = true;
             corriendo = false;
-            MostrarJumpScare();
+            StartCoroutine(UltimateScreamerSequence());
+        }
+    }
+
+    void TriggerWarningMusic()
+    {
+        if (warningSource == null)
+        {
+            warningSource = gameObject.AddComponent<AudioSource>();
+            warningSource.loop = true;
+            warningSource.volume = 0.5f;
+        }
+        if (warningMusicClip != null)
+        {
+            warningSource.clip = warningMusicClip;
+            warningSource.Play();
+        }
+    }
+
+    IEnumerator UltimateScreamerSequence()
+    {
+        if (warningSource != null && warningSource.isPlaying)
+            warningSource.Stop();
+
+        if (timerText != null)
+            timerText.text = "";
+
+        for (int i = 0; i < 3; i++)
+        {
+            GameOverController.LoseLife();
+            if (GameOverController.isGameOver) yield break;
+            yield return new WaitForSeconds(0.3f);
         }
     }
 
@@ -76,6 +121,10 @@ public class PCTimer : MonoBehaviour
     {
         corriendo = false;
         tiempoRestante = GetTimeLimit();
+        warningTriggered = false;
+        ultimateTriggered = false;
+        if (warningSource != null && warningSource.isPlaying)
+            warningSource.Stop();
         if (timerText != null)
             timerText.gameObject.SetActive(false);
     }
@@ -88,14 +137,10 @@ public class PCTimer : MonoBehaviour
             instance.ResetTimer();
     }
 
-    void MostrarJumpScare()
+    public void AddPenalty(float seconds)
     {
-        GameOverController.LoseLife();
-        corriendo = false;
-        consecutiveScares++;
-        if (jumpScareImage != null)
-            jumpScareImage.SetActive(true);
-        gameObject.SetActive(false);
+        tiempoRestante += seconds;
+        if (tiempoRestante < 1f) tiempoRestante = 1f;
     }
 
     public void DetenerTimer()

@@ -10,7 +10,6 @@ public class ClickablePC : MonoBehaviour
     private Button btnComputerRoom;
     private Image btnComputerRoomImg;
     private Image aula306Dot;
-
     void Start()
     {
         CreateComputerRoomButton();
@@ -114,7 +113,7 @@ public class ClickablePC : MonoBehaviour
             }
         }
 
-        if (pcWindow.activeSelf || RouterController.IsOpen || TaskNotesController.IsOpen || ComputerRoomController.IsOpen || Aula306Controller.IsOpen || WireMinigameController.IsOpen) return;
+        if (pcWindow.activeSelf || RouterController.IsOpen || TaskNotesController.IsOpen || ComputerRoomController.IsOpen || Aula306Controller.IsOpen || InformeController.IsOpen || WireMinigameController.IsOpen) return;
 
         if (Input.GetMouseButtonDown(0))
         {
