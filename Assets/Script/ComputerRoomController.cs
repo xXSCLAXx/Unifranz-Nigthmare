@@ -324,6 +324,9 @@ public class ComputerRoomController : MonoBehaviour
         screamerObj.transform.SetAsLastSibling();
         screamerObj.SetActive(true);
 
+        GameObject bloodFilter = GameObject.Find("BloodFilter");
+        if (bloodFilter != null) bloodFilter.SetActive(true);
+
         string videoPath = Application.dataPath + "/Video/pc4_screamer.mp4";
         if (System.IO.File.Exists(videoPath))
         {
@@ -347,6 +350,8 @@ public class ComputerRoomController : MonoBehaviour
             videoPlayer.Stop();
         if (screamerObj != null)
             screamerObj.SetActive(false);
+        GameObject bloodFilter = GameObject.Find("BloodFilter");
+        if (bloodFilter != null) bloodFilter.SetActive(false);
     }
 
     System.Collections.IEnumerator PC4Blink(Text text)
