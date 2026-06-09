@@ -1,19 +1,109 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
 
 public class ClickablePC : MonoBehaviour
 {
     public GameObject pcWindow;
     public GameObject pasilloDerechaPanel;
     public GameObject pasilloIzquierdaPanel;
+    private Button btnComputerRoom;
+    private Image btnComputerRoomImg;
+
+    void Start()
+    {
+        CreateComputerRoomButton();
+    }
+
+    void CreateComputerRoomButton()
+    {
+        if (pasilloDerechaPanel == null) return;
+
+        GameObject btnObj = new GameObject("BtnComputerRoom");
+        btnObj.transform.SetParent(pasilloDerechaPanel.transform, false);
+
+        RectTransform rt = btnObj.AddComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0f, 0f);
+        rt.anchorMax = new Vector2(0f, 0f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = new Vector2(1212f, 494f);
+        rt.sizeDelta = new Vector2(40, 40);
+
+        Texture2D circleTex = new Texture2D(40, 40);
+        for (int y = 0; y < 40; y++)
+            for (int x = 0; x < 40; x++)
+            {
+                float dx = x - 20, dy = y - 20;
+                circleTex.SetPixel(x, y, (dx * dx + dy * dy <= 18 * 18) ? Color.white : Color.clear);
+            }
+        circleTex.Apply();
+
+        btnComputerRoom = btnObj.AddComponent<Button>();
+        btnComputerRoomImg = btnObj.AddComponent<Image>();
+        btnComputerRoom.targetGraphic = btnComputerRoomImg;
+        btnComputerRoomImg.sprite = Sprite.Create(circleTex, new Rect(0, 0, 24, 24), new Vector2(0.5f, 0.5f));
+        btnComputerRoomImg.color = Color.red;
+
+        btnComputerRoom.onClick.AddListener(() =>
+        {
+            ComputerRoomController.Show();
+        });
+
+        StartCoroutine(GlowRoutine());
+    }
+
+    IEnumerator GlowRoutine()
+    {
+        while (true)
+        {
+            if (btnComputerRoomImg != null && pasilloDerechaPanel != null && pasilloDerechaPanel.activeSelf)
+            {
+                float pulse = Mathf.PingPong(Time.time * 1.2f, 1f);
+                float alpha = Mathf.Lerp(0.3f, 0.7f, pulse);
+                btnComputerRoomImg.color = new Color(0.8f, 0.15f, 0.15f, alpha);
+            }
+            yield return null;
+        }
+    }
 
     void Update()
     {
-        if (pcWindow.activeSelf || RouterController.IsOpen || TaskNotesController.IsOpen) return;
+        if (Input.GetMouseButtonDown(0))
+        {
+            // PC4 break check (50% cada click si PC4 est� reparada y no rota)
+            if (TaskNotesController.pc4Fixed && !ComputerRoomController.pc4IsBroken)
+            {
+                float pc4Chance = 0.05f;
+                if (PCWindowController.IsModuleCompleted(4)) pc4Chance = 0.12f;
+                else if (PCWindowController.IsModuleCompleted(2)) pc4Chance = 0.07f;
+                if (Random.value < pc4Chance)
+                    ComputerRoomController.BreakPC4();
+            }
+        }
+
+        if (pcWindow.activeSelf || RouterController.IsOpen || TaskNotesController.IsOpen || ComputerRoomController.IsOpen || WireMinigameController.IsOpen) return;
 
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 mouse = Input.mousePosition;
             Debug.Log("Click: " + mouse);
+
+            // Si un panel de pasillo est� abierto, solo procesar su cierre o boton PC4
+            if (pasilloDerechaPanel.activeSelf)
+            {
+                if (mouse.x > 1190 && mouse.x < 1240 && mouse.y > 470 && mouse.y < 520)
+                    ComputerRoomController.Show();
+                else if (mouse.x > 35 && mouse.x < 355 && mouse.y > 40 && mouse.y < 585)
+                    pasilloDerechaPanel.SetActive(false);
+                return;
+            }
+
+            if (pasilloIzquierdaPanel.activeSelf)
+            {
+                if (mouse.x > 131 && mouse.x < 318 && mouse.y > 46 && mouse.y < 618)
+                    pasilloIzquierdaPanel.SetActive(false);
+                return;
+            }
 
             // PC
             if (mouse.x > 720 && mouse.x < 825 && mouse.y > 270 && mouse.y < 370)
@@ -21,6 +111,7 @@ public class ClickablePC : MonoBehaviour
                 AudioManager am = FindObjectOfType<AudioManager>();
                 if (am != null) am.PlayClickPC();
                 pcWindow.SetActive(true);
+                return;
             }
 
             // Router / WiFi
@@ -38,6 +129,7 @@ public class ClickablePC : MonoBehaviour
                     router = go.AddComponent<RouterController>();
                 }
                 router.Show();
+                return;
             }
 
             // Notes / Task screen (post-it)
@@ -55,30 +147,27 @@ public class ClickablePC : MonoBehaviour
                     notes = go.AddComponent<TaskNotesController>();
                 }
                 notes.Show();
+                return;
             }
 
             // Puerta derecha
             if (!pasilloDerechaPanel.activeSelf && !pasilloIzquierdaPanel.activeSelf)
             {
-                if (mouse.x > 1199 && mouse.x < 1344 && mouse.y > 61 && mouse.y < 631)
+                if (mouse.x > 1500 && mouse.x < 1740 && mouse.y > 200 && mouse.y < 620)
+                {
                     pasilloDerechaPanel.SetActive(true);
-            }
-            else if (pasilloDerechaPanel.activeSelf)
-            {
-                if (mouse.x > 35 && mouse.x < 355 && mouse.y > 40 && mouse.y < 585)
-                    pasilloDerechaPanel.SetActive(false);
+                    return;
+                }
             }
 
             // Puerta izquierda
             if (!pasilloIzquierdaPanel.activeSelf && !pasilloDerechaPanel.activeSelf)
             {
                 if (mouse.x > 131 && mouse.x < 318 && mouse.y > 46 && mouse.y < 618)
+                {
                     pasilloIzquierdaPanel.SetActive(true);
-            }
-            else if (pasilloIzquierdaPanel.activeSelf)
-            {
-                if (mouse.x > 131 && mouse.x < 318 && mouse.y > 46 && mouse.y < 618)
-                    pasilloIzquierdaPanel.SetActive(false);
+                    return;
+                }
             }
         }
     }

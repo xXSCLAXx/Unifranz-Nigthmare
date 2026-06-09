@@ -80,6 +80,14 @@ public class PCTimer : MonoBehaviour
             timerText.gameObject.SetActive(false);
     }
 
+    public static void AddBonusTime(float seconds)
+    {
+        bonusTime += seconds;
+        PCTimer instance = FindObjectOfType<PCTimer>();
+        if (instance != null)
+            instance.ResetTimer();
+    }
+
     void MostrarJumpScare()
     {
         GameOverController.LoseLife();

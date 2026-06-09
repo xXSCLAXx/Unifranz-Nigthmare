@@ -10,7 +10,10 @@ public class TaskNotesController : MonoBehaviour
 
     private GameObject blocker;
     private GameObject panel;
+    private GameObject frontSide;
+    private GameObject backSide;
     private Text taskListText;
+    private bool showingBack = false;
 
     void Awake()
     {
@@ -49,8 +52,25 @@ public class TaskNotesController : MonoBehaviour
         Image bg = panel.AddComponent<Image>();
         bg.color = new Color(1f, 0.95f, 0.5f, 0.95f);
 
+        CreateFrontSide();
+        CreateBackSide();
+        CreateFlipButton();
+
+        frontSide.SetActive(true);
+        backSide.SetActive(false);
+    }
+
+    void CreateFrontSide()
+    {
+        frontSide = new GameObject("FrontSide");
+        frontSide.transform.SetParent(panel.transform, false);
+        RectTransform fRt = frontSide.AddComponent<RectTransform>();
+        fRt.anchorMin = Vector2.zero;
+        fRt.anchorMax = Vector2.one;
+        fRt.sizeDelta = Vector2.zero;
+
         GameObject titleObj = new GameObject("Title");
-        titleObj.transform.SetParent(panel.transform, false);
+        titleObj.transform.SetParent(frontSide.transform, false);
         Text title = titleObj.AddComponent<Text>();
         title.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         title.fontSize = 22;
@@ -65,7 +85,7 @@ public class TaskNotesController : MonoBehaviour
         tRt.anchoredPosition = Vector2.zero;
 
         GameObject listObj = new GameObject("TaskList");
-        listObj.transform.SetParent(panel.transform, false);
+        listObj.transform.SetParent(frontSide.transform, false);
         taskListText = listObj.AddComponent<Text>();
         taskListText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         taskListText.fontSize = 14;
@@ -78,18 +98,80 @@ public class TaskNotesController : MonoBehaviour
         lRt.sizeDelta = Vector2.zero;
         lRt.anchoredPosition = Vector2.zero;
 
+        GameObject closeBtn = CreateCloseButton(frontSide.transform);
+        closeBtn.GetComponent<RectTransform>().anchorMin = new Vector2(1f, 1f);
+        closeBtn.GetComponent<RectTransform>().anchorMax = new Vector2(1f, 1f);
+        closeBtn.GetComponent<RectTransform>().pivot = new Vector2(1f, 1f);
+        closeBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(-5f, -5f);
+    }
+
+    void CreateBackSide()
+    {
+        backSide = new GameObject("BackSide");
+        backSide.transform.SetParent(panel.transform, false);
+        RectTransform bRt = backSide.AddComponent<RectTransform>();
+        bRt.anchorMin = Vector2.zero;
+        bRt.anchorMax = Vector2.one;
+        bRt.sizeDelta = Vector2.zero;
+
+        GameObject titleObj = new GameObject("Title");
+        titleObj.transform.SetParent(backSide.transform, false);
+        Text title = titleObj.AddComponent<Text>();
+        title.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        title.fontSize = 18;
+        title.fontStyle = FontStyle.Bold;
+        title.color = new Color(0.3f, 0.15f, 0f);
+        title.text = "Secundarias";
+        title.alignment = TextAnchor.MiddleCenter;
+        RectTransform tRt = titleObj.GetComponent<RectTransform>();
+        tRt.anchorMin = new Vector2(0f, 0.88f);
+        tRt.anchorMax = new Vector2(1f, 0.96f);
+        tRt.sizeDelta = Vector2.zero;
+
+        GameObject infoObj = new GameObject("InfoText");
+        infoObj.transform.SetParent(backSide.transform, false);
+        Text info = infoObj.AddComponent<Text>();
+        info.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        info.fontSize = 13;
+        info.color = new Color(0.3f, 0.15f, 0f);
+        info.alignment = TextAnchor.UpperLeft;
+        info.supportRichText = true;
+        info.text = "<b>WiFi:</b>\n"
+            + "  - 9% de romperse al navegar\n"
+            + "  - 15s para reiniciarlo\n"
+            + "  - Si falla: screamer\n"
+            + "  - Recompensa: +1s al timer\n\n"
+            + "<b>PC4 (Sala PCs):</b>\n"
+            + "  - 12% de romperse al navegar\n"
+            + "  - 20s para arreglarla\n"
+            + "  - Si falla: screamer\n"
+            + "  - Recompensa: +2s al timer\n\n"
+            + "<b>Documento:</b>\n"
+            + "  - Sin riesgo\n"
+            + "  - Solo corregir errores";
+        RectTransform iRt = infoObj.GetComponent<RectTransform>();
+        iRt.anchorMin = new Vector2(0.05f, 0.05f);
+        iRt.anchorMax = new Vector2(0.95f, 0.83f);
+        iRt.sizeDelta = Vector2.zero;
+
+        GameObject closeBtn = CreateCloseButton(backSide.transform);
+        closeBtn.GetComponent<RectTransform>().anchorMin = new Vector2(1f, 1f);
+        closeBtn.GetComponent<RectTransform>().anchorMax = new Vector2(1f, 1f);
+        closeBtn.GetComponent<RectTransform>().pivot = new Vector2(1f, 1f);
+        closeBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(-5f, -5f);
+    }
+
+    GameObject CreateCloseButton(Transform parent)
+    {
         GameObject closeBtn = new GameObject("CloseBtn");
-        closeBtn.transform.SetParent(panel.transform, false);
+        closeBtn.transform.SetParent(parent, false);
         Image btnImg = closeBtn.AddComponent<Image>();
         btnImg.color = new Color(0.8f, 0.2f, 0.2f, 1f);
         Button btn = closeBtn.AddComponent<Button>();
         btn.onClick.AddListener(Close);
         RectTransform bRt = closeBtn.GetComponent<RectTransform>();
-        bRt.anchorMin = new Vector2(1f, 1f);
-        bRt.anchorMax = new Vector2(1f, 1f);
-        bRt.pivot = new Vector2(1f, 1f);
         bRt.sizeDelta = new Vector2(30f, 30f);
-        bRt.anchoredPosition = new Vector2(-5f, -5f);
+
         GameObject xTxt = new GameObject("XText");
         xTxt.transform.SetParent(closeBtn.transform, false);
         Text xLabel = xTxt.AddComponent<Text>();
@@ -102,18 +184,60 @@ public class TaskNotesController : MonoBehaviour
         xRt.anchorMin = Vector2.zero;
         xRt.anchorMax = Vector2.one;
         xRt.sizeDelta = Vector2.zero;
-        xRt.anchoredPosition = Vector2.zero;
+
+        return closeBtn;
+    }
+
+    void CreateFlipButton()
+    {
+        GameObject flipBtn = new GameObject("FlipBtn");
+        flipBtn.transform.SetParent(panel.transform, false);
+        RectTransform fRt = flipBtn.AddComponent<RectTransform>();
+        fRt.anchorMin = new Vector2(0f, 0f);
+        fRt.anchorMax = new Vector2(0f, 0f);
+        fRt.pivot = new Vector2(0.5f, 0.5f);
+        fRt.sizeDelta = new Vector2(50f, 26f);
+        fRt.anchoredPosition = new Vector2(30f, 15f);
+        Image fImg = flipBtn.AddComponent<Image>();
+        fImg.color = new Color(0.6f, 0.4f, 0.1f, 0.8f);
+        Button fBtn = flipBtn.AddComponent<Button>();
+        fBtn.targetGraphic = fImg;
+        fBtn.onClick.AddListener(ToggleFlip);
+
+        GameObject fTextObj = new GameObject("Text");
+        fTextObj.transform.SetParent(flipBtn.transform, false);
+        RectTransform fTextRt = fTextObj.AddComponent<RectTransform>();
+        fTextRt.anchorMin = Vector2.zero;
+        fTextRt.anchorMax = Vector2.one;
+        fTextRt.sizeDelta = Vector2.zero;
+        Text fText = fTextObj.AddComponent<Text>();
+        fText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        fText.fontSize = 12;
+        fText.fontStyle = FontStyle.Bold;
+        fText.alignment = TextAnchor.MiddleCenter;
+        fText.color = Color.white;
+        fText.text = "VOLTEAR";
+    }
+
+    void ToggleFlip()
+    {
+        showingBack = !showingBack;
+        frontSide.SetActive(!showingBack);
+        backSide.SetActive(showingBack);
     }
 
     void Update()
     {
-        if (panel != null && panel.activeSelf)
+        if (panel != null && panel.activeSelf && frontSide.activeSelf)
             UpdateTaskList();
     }
 
     public void Show()
     {
         IsOpen = true;
+        showingBack = false;
+        frontSide.SetActive(true);
+        backSide.SetActive(false);
         blocker.SetActive(true);
         UpdateTaskList();
         panel.SetActive(true);

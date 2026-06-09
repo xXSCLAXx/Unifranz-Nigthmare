@@ -522,7 +522,10 @@ public class RouterController : MonoBehaviour
 
         if (wifiRestarted && !wifiBrokenAgain && !panel.activeSelf && Input.GetMouseButtonDown(0))
         {
-            if (Random.value < 0.1f)
+            float wifiChance = 0.03f;
+            if (PCWindowController.IsModuleCompleted(4)) wifiChance = 0.08f;
+            else if (PCWindowController.IsModuleCompleted(2)) wifiChance = 0.05f;
+            if (Random.value < wifiChance)
             {
                 wifiBrokenAgain = true;
                 wifiFixed = false;
