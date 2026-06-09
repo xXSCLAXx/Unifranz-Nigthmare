@@ -108,7 +108,7 @@ public class ComputerRoomController : MonoBehaviour
 
         Image bg = panel.AddComponent<Image>();
         Sprite bgSprite = null;
-        string imgPath = Application.dataPath + "/Texture/computer_room.png";
+        string imgPath = Application.streamingAssetsPath + "/Texture/computer_room.png";
         if (System.IO.File.Exists(imgPath))
         {
             byte[] bytes = System.IO.File.ReadAllBytes(imgPath);
@@ -309,7 +309,7 @@ public class ComputerRoomController : MonoBehaviour
         GameObject bloodFilter = GameObject.Find("BloodFilter");
         if (bloodFilter != null) bloodFilter.SetActive(true);
 
-        string videoPath = Application.dataPath + "/Video/pc4_screamer.mp4";
+        string videoPath = Application.streamingAssetsPath + "/Video/pc4_screamer.mp4";
         if (System.IO.File.Exists(videoPath))
         {
             videoPlayer.url = videoPath;

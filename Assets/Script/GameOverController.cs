@@ -48,7 +48,7 @@ public class GameOverController : MonoBehaviour
 
             Image bg = panel.AddComponent<Image>();
             Sprite bgSprite = null;
-            string imgPath = Application.dataPath + "/Texture/gameover.png";
+            string imgPath = Application.streamingAssetsPath + "/Texture/gameover.png";
             if (System.IO.File.Exists(imgPath))
             {
                 byte[] bytes = System.IO.File.ReadAllBytes(imgPath);

@@ -431,7 +431,7 @@ public class InformeController : MonoBehaviour
 
     IEnumerator LoadWarningClip()
     {
-        string path = "file:///" + Application.dataPath + "/Audio/warning.wav";
+        string path = "file:///" + Application.streamingAssetsPath + "/Audio/warning.wav";
         using (WWW www = new WWW(path))
         {
             yield return www;

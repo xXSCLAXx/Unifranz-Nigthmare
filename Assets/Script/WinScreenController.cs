@@ -41,7 +41,7 @@ public class WinScreenController : MonoBehaviour
 
         Image bg = panel.AddComponent<Image>();
         Sprite bgSprite = null;
-        string imgPath = Application.dataPath + "/Texture/win.png";
+        string imgPath = Application.streamingAssetsPath + "/Texture/win.png";
         if (System.IO.File.Exists(imgPath))
         {
             byte[] bytes = System.IO.File.ReadAllBytes(imgPath);

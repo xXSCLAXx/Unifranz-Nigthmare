@@ -48,7 +48,7 @@ public class Aula306Controller : MonoBehaviour
 
         Image bg = panel.AddComponent<Image>();
         Sprite bgSprite = null;
-        string imgPath = Application.dataPath + "/Texture/aula306.png";
+        string imgPath = Application.streamingAssetsPath + "/Texture/aula306.png";
         if (System.IO.File.Exists(imgPath))
         {
             byte[] bytes = System.IO.File.ReadAllBytes(imgPath);
