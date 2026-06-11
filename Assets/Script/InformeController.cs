@@ -134,13 +134,17 @@ public class InformeController : MonoBehaviour
         cRt.anchorMin = new Vector2(1f, 1f);
         cRt.anchorMax = new Vector2(1f, 1f);
         cRt.pivot = new Vector2(1f, 1f);
-        cRt.sizeDelta = new Vector2(30f, 30f);
+        cRt.sizeDelta = new Vector2(51f, 51f);
         cRt.anchoredPosition = new Vector2(-5f, -5f);
         Image cImg = closeObj.AddComponent<Image>();
         cImg.color = new Color(0.8f, 0.15f, 0.15f, 0.9f);
         Button cBtn = closeObj.AddComponent<Button>();
         cBtn.targetGraphic = cImg;
-        cBtn.onClick.AddListener(Close);
+        cBtn.onClick.AddListener(() => {
+            AudioManager am = FindObjectOfType<AudioManager>();
+            if (am != null) am.PlayClickPC();
+            Close();
+        });
 
         GameObject cTextObj = new GameObject("Text");
         cTextObj.transform.SetParent(closeObj.transform, false);

@@ -465,12 +465,16 @@ public class RouterController : MonoBehaviour
         Image btnImg = closeBtn.AddComponent<Image>();
         btnImg.color = new Color(0.8f, 0.15f, 0.15f, 1f);
         Button btn = closeBtn.AddComponent<Button>();
-        btn.onClick.AddListener(Close);
+        btn.onClick.AddListener(() => {
+            AudioManager am = FindObjectOfType<AudioManager>();
+            if (am != null) am.PlayClickPC();
+            Close();
+        });
         RectTransform bRt = closeBtn.GetComponent<RectTransform>();
         bRt.anchorMin = new Vector2(1f, 1f);
         bRt.anchorMax = new Vector2(1f, 1f);
         bRt.pivot = new Vector2(1f, 1f);
-        bRt.sizeDelta = new Vector2(28f, 28f);
+        bRt.sizeDelta = new Vector2(48f, 48f);
         bRt.anchoredPosition = new Vector2(-4f, -4f);
         GameObject xTxt = new GameObject("XText");
         xTxt.transform.SetParent(closeBtn.transform, false);

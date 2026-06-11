@@ -64,7 +64,7 @@ public class Aula306Controller : MonoBehaviour
         }
         else
             bg.color = new Color(0.1f, 0.05f, 0.15f, 1f);
-        bg.raycastTarget = true;
+        bg.raycastTarget = false;
 
         GameObject textObj = new GameObject("TitleText");
         textObj.transform.SetParent(panel.transform, false);
@@ -85,10 +85,10 @@ public class Aula306Controller : MonoBehaviour
         GameObject laptopBtn = new GameObject("BtnLaptopInforme");
         laptopBtn.transform.SetParent(panel.transform, false);
         RectTransform lRt = laptopBtn.AddComponent<RectTransform>();
-        lRt.anchorMin = new Vector2(0f, 0f);
-        lRt.anchorMax = new Vector2(0f, 0f);
+        lRt.anchorMin = new Vector2(960f / 1920f, 340f / 1080f);
+        lRt.anchorMax = new Vector2(960f / 1920f, 340f / 1080f);
         lRt.pivot = new Vector2(0.5f, 0.5f);
-        lRt.anchoredPosition = new Vector2(960f, 340f);
+        lRt.anchoredPosition = Vector2.zero;
         lRt.sizeDelta = new Vector2(200, 140);
         Image lImg = laptopBtn.AddComponent<Image>();
         lImg.color = new Color(1f, 1f, 1f, 0f);
@@ -120,12 +120,16 @@ public class Aula306Controller : MonoBehaviour
         cRt.anchorMax = new Vector2(0f, 0f);
         cRt.pivot = new Vector2(0.5f, 0.5f);
         cRt.anchoredPosition = new Vector2(50, 50);
-        cRt.sizeDelta = new Vector2(40, 40);
+        cRt.sizeDelta = new Vector2(68, 68);
         Image cImg = closeObj.AddComponent<Image>();
         cImg.color = new Color(0.8f, 0.15f, 0.15f, 0.85f);
         Button cBtn = closeObj.AddComponent<Button>();
         cBtn.targetGraphic = cImg;
-        cBtn.onClick.AddListener(() => Close());
+        cBtn.onClick.AddListener(() => {
+            AudioManager am = FindObjectOfType<AudioManager>();
+            if (am != null) am.PlayClickPC();
+            Close();
+        });
 
         GameObject cTextObj = new GameObject("Text");
         cTextObj.transform.SetParent(closeObj.transform, false);

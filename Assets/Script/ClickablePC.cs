@@ -24,10 +24,10 @@ public class ClickablePC : MonoBehaviour
         btnObj.transform.SetParent(pasilloDerechaPanel.transform, false);
 
         RectTransform rt = btnObj.AddComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0f, 0f);
-        rt.anchorMax = new Vector2(0f, 0f);
+        rt.anchorMin = new Vector2(1212f / 1920f, 494f / 1080f);
+        rt.anchorMax = new Vector2(1212f / 1920f, 494f / 1080f);
         rt.pivot = new Vector2(0.5f, 0.5f);
-        rt.anchoredPosition = new Vector2(1212f, 494f);
+        rt.anchoredPosition = Vector2.zero;
         rt.sizeDelta = new Vector2(40, 40);
 
         Texture2D circleTex = new Texture2D(40, 40);
@@ -61,10 +61,10 @@ public class ClickablePC : MonoBehaviour
         dotObj.transform.SetParent(pasilloIzquierdaPanel.transform, false);
 
         RectTransform rt = dotObj.AddComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0f, 0f);
-        rt.anchorMax = new Vector2(0f, 0f);
+        rt.anchorMin = new Vector2(605f / 1920f, 452.5f / 1080f);
+        rt.anchorMax = new Vector2(605f / 1920f, 452.5f / 1080f);
         rt.pivot = new Vector2(0.5f, 0.5f);
-        rt.anchoredPosition = new Vector2(605f, 452.5f);
+        rt.anchoredPosition = Vector2.zero;
         rt.sizeDelta = new Vector2(30, 30);
 
         Texture2D circleTex = new Texture2D(30, 30);
@@ -118,29 +118,31 @@ public class ClickablePC : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 mouse = Input.mousePosition;
-            Debug.Log("Click: " + mouse);
+            float nx = mouse.x / Screen.width;
+            float ny = mouse.y / Screen.height;
+            Debug.Log("Click normalized: (" + nx.ToString("F3") + ", " + ny.ToString("F3") + ")");
 
             // Si un panel de pasillo est? abierto, solo procesar su cierre o boton PC4
             if (pasilloDerechaPanel.activeSelf)
             {
-                if (mouse.x > 1190 && mouse.x < 1240 && mouse.y > 470 && mouse.y < 520)
+                if (nx > 0.620f && nx < 0.646f && ny > 0.435f && ny < 0.481f)
                     ComputerRoomController.Show();
-                else if (mouse.x > 35 && mouse.x < 355 && mouse.y > 40 && mouse.y < 585)
+                else if (nx > 0.018f && nx < 0.185f && ny > 0.037f && ny < 0.542f)
                     pasilloDerechaPanel.SetActive(false);
                 return;
             }
 
             if (pasilloIzquierdaPanel.activeSelf)
             {
-                if (mouse.x > 490 && mouse.x < 720 && mouse.y > 290 && mouse.y < 560)
+                if (nx > 0.255f && nx < 0.375f && ny > 0.269f && ny < 0.519f)
                     Aula306Controller.Show();
-                else if (mouse.x > 131 && mouse.x < 318 && mouse.y > 46 && mouse.y < 618)
+                else if (nx > 0.068f && nx < 0.166f && ny > 0.043f && ny < 0.572f)
                     pasilloIzquierdaPanel.SetActive(false);
                 return;
             }
 
             // PC
-            if (mouse.x > 720 && mouse.x < 825 && mouse.y > 270 && mouse.y < 370)
+            if (nx > 0.375f && nx < 0.430f && ny > 0.325f && ny < 0.418f)
             {
                 AudioManager am = FindObjectOfType<AudioManager>();
                 if (am != null) am.PlayClickPC();
@@ -149,7 +151,7 @@ public class ClickablePC : MonoBehaviour
             }
 
             // Router / WiFi
-            if (mouse.x > 970 && mouse.x < 1070 && mouse.y > 260 && mouse.y < 360)
+            if (nx > 0.505f && nx < 0.557f && ny > 0.316f && ny < 0.408f)
             {
                 AudioManager am = FindObjectOfType<AudioManager>();
                 if (am != null) am.PlayClickPC();
@@ -167,7 +169,7 @@ public class ClickablePC : MonoBehaviour
             }
 
             // Notes / Task screen (post-it)
-            if (mouse.x > 830 && mouse.x < 995 && mouse.y > 310 && mouse.y < 450)
+            if (nx > 0.432f && nx < 0.518f && ny > 0.362f && ny < 0.492f)
             {
                 AudioManager am = FindObjectOfType<AudioManager>();
                 if (am != null) am.PlayClickPC();
@@ -187,7 +189,7 @@ public class ClickablePC : MonoBehaviour
             // Puerta derecha
             if (!pasilloDerechaPanel.activeSelf && !pasilloIzquierdaPanel.activeSelf)
             {
-                if (mouse.x > 1500 && mouse.x < 1740 && mouse.y > 200 && mouse.y < 620)
+                if (nx > 0.781f && nx < 0.906f && ny > 0.185f && ny < 0.574f)
                 {
                     pasilloDerechaPanel.SetActive(true);
                     return;
@@ -197,7 +199,7 @@ public class ClickablePC : MonoBehaviour
             // Puerta izquierda
             if (!pasilloIzquierdaPanel.activeSelf && !pasilloDerechaPanel.activeSelf)
             {
-                if (mouse.x > 131 && mouse.x < 318 && mouse.y > 46 && mouse.y < 618)
+                if (nx > 0.068f && nx < 0.166f && ny > 0.043f && ny < 0.572f)
                 {
                     pasilloIzquierdaPanel.SetActive(true);
                     return;

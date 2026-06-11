@@ -133,12 +133,16 @@ public class ComputerRoomController : MonoBehaviour
         cRt.anchorMax = new Vector2(0f, 0f);
         cRt.pivot = new Vector2(0.5f, 0.5f);
         cRt.anchoredPosition = new Vector2(50, 50);
-        cRt.sizeDelta = new Vector2(40, 40);
+        cRt.sizeDelta = new Vector2(68, 68);
         Image cImg = closeObj.AddComponent<Image>();
         cImg.color = new Color(0.8f, 0.15f, 0.15f, 0.85f);
         Button cBtn = closeObj.AddComponent<Button>();
         cBtn.targetGraphic = cImg;
-        cBtn.onClick.AddListener(() => Close());
+        cBtn.onClick.AddListener(() => {
+            AudioManager am = FindObjectOfType<AudioManager>();
+            if (am != null) am.PlayClickPC();
+            Close();
+        });
 
         GameObject cTextObj = new GameObject("Text");
         cTextObj.transform.SetParent(closeObj.transform, false);
@@ -164,10 +168,10 @@ public class ComputerRoomController : MonoBehaviour
         GameObject pc4Obj = new GameObject("PC4");
         pc4Obj.transform.SetParent(panel.transform, false);
         RectTransform pc4Rt = pc4Obj.AddComponent<RectTransform>();
-        pc4Rt.anchorMin = new Vector2(0f, 0f);
-        pc4Rt.anchorMax = new Vector2(0f, 0f);
+        pc4Rt.anchorMin = new Vector2(1040f / 1920f, 469f / 1080f);
+        pc4Rt.anchorMax = new Vector2(1040f / 1920f, 469f / 1080f);
         pc4Rt.pivot = new Vector2(0.5f, 0.5f);
-        pc4Rt.anchoredPosition = new Vector2(1046f, 407f);
+        pc4Rt.anchoredPosition = Vector2.zero;
         pc4Rt.sizeDelta = new Vector2(80, 40);
 
         if (!alreadyFixed)

@@ -174,9 +174,13 @@ public class TaskNotesController : MonoBehaviour
         Image btnImg = closeBtn.AddComponent<Image>();
         btnImg.color = new Color(0.8f, 0.2f, 0.2f, 1f);
         Button btn = closeBtn.AddComponent<Button>();
-        btn.onClick.AddListener(Close);
+        btn.onClick.AddListener(() => {
+            AudioManager am = FindObjectOfType<AudioManager>();
+            if (am != null) am.PlayClickPC();
+            Close();
+        });
         RectTransform bRt = closeBtn.GetComponent<RectTransform>();
-        bRt.sizeDelta = new Vector2(30f, 30f);
+        bRt.sizeDelta = new Vector2(51f, 51f);
 
         GameObject xTxt = new GameObject("XText");
         xTxt.transform.SetParent(closeBtn.transform, false);
