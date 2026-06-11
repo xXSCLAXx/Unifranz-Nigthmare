@@ -242,6 +242,15 @@ public class TaskNotesController : MonoBehaviour
             UpdateTaskList();
     }
 
+    public static void ResetStatics()
+    {
+        IsOpen = false;
+        wifiFixed = false;
+        documentFixed = false;
+        pc4Fixed = false;
+        informeFixed = false;
+    }
+
     public void Show()
     {
         IsOpen = true;

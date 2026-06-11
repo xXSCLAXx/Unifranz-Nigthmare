@@ -141,6 +141,13 @@ public class Aula306Controller : MonoBehaviour
         cText.text = "X";
     }
 
+    public static void ResetStatics()
+    {
+        IsOpen = false;
+        instance = null;
+        canvasRoot = null;
+    }
+
     void Close()
     {
         IsOpen = false;

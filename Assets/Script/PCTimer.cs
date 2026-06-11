@@ -123,4 +123,10 @@ public class PCTimer : MonoBehaviour
     {
         return false;
     }
+
+    public static void ResetStatics()
+    {
+        consecutiveScares = 0;
+        bonusTime = 0f;
+    }
 }

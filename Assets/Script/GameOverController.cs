@@ -92,8 +92,7 @@ public class GameOverController : MonoBehaviour
 
             CreateButton("BtnReintentar", "REINTENTAR", 0.4f, 0.35f, () =>
             {
-                lives = 3;
-                isGameOver = false;
+                GameStateReset.ResetAll();
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             });
 
@@ -109,6 +108,13 @@ public class GameOverController : MonoBehaviour
             created = true;
         }
         panel.SetActive(true);
+    }
+
+    public static void ResetStatics()
+    {
+        lives = 3;
+        isGameOver = false;
+        instance = null;
     }
 
     void CreateButton(string name, string label, float x, float y, UnityEngine.Events.UnityAction action)

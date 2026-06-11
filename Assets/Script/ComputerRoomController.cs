@@ -358,6 +358,40 @@ public class ComputerRoomController : MonoBehaviour
         }
     }
 
+    public static void ResetStatics()
+    {
+        if (alarmSource != null && alarmSource.isPlaying)
+            alarmSource.Stop();
+        if (alertOverlay != null)
+            alertOverlay.SetActive(false);
+        if (instance != null)
+        {
+            if (instance.screamerObj != null)
+                instance.screamerObj.SetActive(false);
+            if (instance.videoPlayer != null && instance.videoPlayer.isPlaying)
+                instance.videoPlayer.Stop();
+            if (instance.pc4ScreamerRt != null)
+            {
+                instance.pc4ScreamerRt.Release();
+                instance.pc4ScreamerRt = null;
+            }
+        }
+        IsOpen = false;
+        pc4IsBroken = false;
+        persistentCreated = false;
+        breakTimer = 0f;
+        instance = null;
+        canvasRoot = null;
+        firstTimeBonusClaimed = false;
+        alertOverlay = null;
+        alarmSource = null;
+        if (alarmClip != null)
+        {
+            Object.Destroy(alarmClip);
+            alarmClip = null;
+        }
+    }
+
     void Close()
     {
         IsOpen = false;

@@ -28,6 +28,14 @@ public class WinScreenController : MonoBehaviour
     void CreateWinScreen()
     {
         Transform canvas = transform.parent;
+
+        GameObject informeAlert = GameObject.Find("InformeAlert");
+        if (informeAlert != null) informeAlert.SetActive(false);
+        GameObject pc4Alert = GameObject.Find("PC4AlertOverlay");
+        if (pc4Alert != null) pc4Alert.SetActive(false);
+        GameObject routerAlert = GameObject.Find("AlertOverlay");
+        if (routerAlert != null) routerAlert.SetActive(false);
+
         PlayMusic();
 
         panel = new GameObject("WinPanel");
@@ -82,21 +90,12 @@ public class WinScreenController : MonoBehaviour
         iRt.sizeDelta = Vector2.zero;
         iRt.anchoredPosition = Vector2.zero;
 
-        CreateButton("BtnMenu", "MENU PRINCIPAL", 0.4f, 0.35f, () =>
+        CreateButton("BtnReintentar", "REINTENTAR", 0.5f, 0.35f, () =>
         {
-            GameOverController.lives = 3;
-            GameOverController.isGameOver = false;
-            winShown = false;
-            SceneManager.LoadScene(0);
-        });
-
-        CreateButton("BtnSalir", "SALIR", 0.6f, 0.35f, () =>
-        {
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
+            if (audioSource != null && audioSource.isPlaying)
+                audioSource.Stop();
+            GameStateReset.ResetAll();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         });
     }
 
@@ -128,6 +127,12 @@ public class WinScreenController : MonoBehaviour
         txtRt.anchorMax = Vector2.one;
         txtRt.sizeDelta = Vector2.zero;
         txtRt.anchoredPosition = Vector2.zero;
+    }
+
+    public static void ResetStatics()
+    {
+        winShown = false;
+        instance = null;
     }
 
     void PlayMusic()

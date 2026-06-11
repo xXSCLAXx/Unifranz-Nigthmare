@@ -458,6 +458,15 @@ public class RouterController : MonoBehaviour
         txtRt.anchoredPosition = Vector2.zero;
     }
 
+    public static void ResetStatics()
+    {
+        IsOpen = false;
+        wifiFixed = false;
+        firstTimeRewardGiven = false;
+        wifiBrokenAgain = false;
+        brokenTimer = 0f;
+    }
+
     void CreateCloseButton()
     {
         GameObject closeBtn = new GameObject("CloseBtn");

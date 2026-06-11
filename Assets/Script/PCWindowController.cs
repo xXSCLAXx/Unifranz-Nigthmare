@@ -947,4 +947,15 @@ public class PCWindowController : MonoBehaviour
     public static int GetModuleCount() { return tasks?.Count ?? 0; }
     public static bool IsModuleCompleted(int index) { return tasks != null && index >= 0 && index < tasks.Count && tasks[index].completed; }
     public static string GetModuleName(int index) { return tasks != null && index >= 0 && index < tasks.Count ? tasks[index].name : ""; }
+
+    public static void ResetStatics()
+    {
+        initialized = false;
+        tasks = null;
+        currentTaskIndex = -1;
+        currentProgress = 0f;
+        isLoading = false;
+        chatHistory = "";
+        lastChatText = "";
+    }
 }

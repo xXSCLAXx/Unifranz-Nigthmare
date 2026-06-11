@@ -685,6 +685,22 @@ public class InformeController : MonoBehaviour
         if (OnClose != null) OnClose();
     }
 
+    public static void ResetStatics()
+    {
+        if (instance != null)
+        {
+            instance.StopWarningMusic();
+            instance.ShowGlobalAlert(false);
+            if (instance.panel != null) instance.panel.SetActive(false);
+            if (instance.blocker != null) instance.blocker.SetActive(false);
+        }
+        IsOpen = false;
+        instance = null;
+        canvasRoot = null;
+        firstErrorFixed = false;
+        OnClose = null;
+    }
+
     void OnDestroy()
     {
         if (panel != null) Destroy(panel);

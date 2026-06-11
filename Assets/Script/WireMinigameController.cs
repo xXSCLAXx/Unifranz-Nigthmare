@@ -213,6 +213,12 @@ public class WireMinigameController : MonoBehaviour
         return new Color(c.r * 0.6f, c.g * 0.6f, c.b * 0.6f, 0.9f);
     }
 
+    public static void ResetStatics()
+    {
+        IsOpen = false;
+        instance = null;
+    }
+
     void Complete()
     {
         IsOpen = false;
