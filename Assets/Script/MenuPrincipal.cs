@@ -8,12 +8,46 @@ public class MenuPrincipal : MonoBehaviour
 
     void Start()
     {
-        uiFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        uiFont = Resources.Load<Font>("Fonts/fnaf");
+        if (uiFont == null)
+            uiFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
         if (uiFont == null)
             uiFont = Font.CreateDynamicFontFromOSFont("Arial", 16);
         if (uiFont == null)
             uiFont = Font.CreateDynamicFontFromOSFont("Times New Roman", 16);
+        UpdateSceneFonts();
         CreateInstructionsButton();
+    }
+
+    void UpdateSceneFonts()
+    {
+        GameObject titulo = GameObject.Find("Titulo");
+        if (titulo != null)
+        {
+            Text t = titulo.GetComponent<Text>();
+            if (t != null)
+            {
+                t.font = uiFont;
+                t.fontSize = 48;
+            }
+        }
+
+        UpdateButtonFont("BotonJugar", 40);
+        UpdateButtonFont("BotonSalir", 40);
+    }
+
+    void UpdateButtonFont(string buttonName, int fontSize)
+    {
+        GameObject btn = GameObject.Find(buttonName);
+        if (btn == null) return;
+        Text txt = btn.GetComponentInChildren<Text>();
+        if (txt == null) return;
+        txt.font = uiFont;
+        txt.fontSize = fontSize;
+
+        RectTransform rt = btn.GetComponent<RectTransform>();
+        if (rt != null)
+            rt.sizeDelta = new Vector2(rt.sizeDelta.x, fontSize + 26);
     }
 
     void CreateInstructionsButton()
@@ -36,7 +70,7 @@ public class MenuPrincipal : MonoBehaviour
         btnRt.anchorMax = new Vector2(0.5f, 0.5f);
         btnRt.pivot = new Vector2(0.5f, 0.5f);
         btnRt.anchoredPosition = new Vector2(0f, offsetY);
-        btnRt.sizeDelta = new Vector2(280f, 46f);
+        btnRt.sizeDelta = new Vector2(320f, 58f);
 
         Image btnImg = btnObj.AddComponent<Image>();
         btnImg.color = new Color(0.3f, 0.2f, 0.05f, 0.8f);
@@ -49,8 +83,8 @@ public class MenuPrincipal : MonoBehaviour
         iconRt.sizeDelta = Vector2.zero;
         Text iconText = iconObj.AddComponent<Text>();
         iconText.font = uiFont;
-        iconText.fontSize = 24;
-        iconText.fontStyle = FontStyle.Bold;
+        iconText.fontSize = 32;
+        iconText.fontStyle = FontStyle.Normal;
         iconText.alignment = TextAnchor.MiddleCenter;
         iconText.color = Color.white;
         iconText.text = "INSTRUCCIONES";
@@ -131,8 +165,8 @@ public class MenuPrincipal : MonoBehaviour
         titleRt.anchoredPosition = new Vector2(0f, -15f);
         Text titleText = titleObj.AddComponent<Text>();
         titleText.font = uiFont;
-        titleText.fontSize = 20;
-        titleText.fontStyle = FontStyle.Bold;
+        titleText.fontSize = 28;
+        titleText.fontStyle = FontStyle.Normal;
         titleText.alignment = TextAnchor.MiddleCenter;
         titleText.color = Color.black;
         titleText.text = "INSTRUCCIONES";
@@ -162,8 +196,8 @@ public class MenuPrincipal : MonoBehaviour
         cTextRt.sizeDelta = Vector2.zero;
         Text cText = cTextObj.AddComponent<Text>();
         cText.font = uiFont;
-        cText.fontSize = 24;
-        cText.fontStyle = FontStyle.Bold;
+        cText.fontSize = 28;
+        cText.fontStyle = FontStyle.Normal;
         cText.alignment = TextAnchor.MiddleCenter;
         cText.color = Color.white;
         cText.text = "X";
@@ -211,7 +245,7 @@ public class MenuPrincipal : MonoBehaviour
 
         Text contentText = contentObj.AddComponent<Text>();
         contentText.font = uiFont;
-        contentText.fontSize = 15;
+        contentText.fontSize = 18;
         contentText.color = Color.black;
         contentText.supportRichText = true;
         contentText.text = GetInstructionsText();

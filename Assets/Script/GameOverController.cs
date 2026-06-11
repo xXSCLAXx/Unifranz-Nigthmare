@@ -78,15 +78,18 @@ public class GameOverController : MonoBehaviour
             GameObject infoObj = new GameObject("InfoText");
             infoObj.transform.SetParent(panel.transform, false);
             Text info = infoObj.AddComponent<Text>();
-            info.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            info.fontSize = 22;
-            info.fontStyle = FontStyle.Bold;
+            Font fnafFont = Resources.Load<Font>("Fonts/fnaf");
+            if (fnafFont == null)
+                fnafFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            info.font = fnafFont;
+            info.fontSize = 48;
+            info.fontStyle = FontStyle.Normal;
             info.alignment = TextAnchor.MiddleCenter;
             info.color = new Color(1f, 0.8f, 0.2f);
             info.text = "GAME OVER\n\nTareas completadas: " + completed + " / " + total;
             RectTransform iRt = infoObj.GetComponent<RectTransform>();
-            iRt.anchorMin = new Vector2(0f, 0.55f);
-            iRt.anchorMax = new Vector2(1f, 0.7f);
+            iRt.anchorMin = new Vector2(0f, 0.5f);
+            iRt.anchorMax = new Vector2(1f, 0.72f);
             iRt.sizeDelta = Vector2.zero;
             iRt.anchoredPosition = Vector2.zero;
 
@@ -126,17 +129,20 @@ public class GameOverController : MonoBehaviour
         Button btn = btnObj.AddComponent<Button>();
         btn.onClick.AddListener(action);
         RectTransform rt = btnObj.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(x - 0.1f, y);
-        rt.anchorMax = new Vector2(x + 0.1f, y + 0.07f);
+        rt.anchorMin = new Vector2(x - 0.13f, y);
+        rt.anchorMax = new Vector2(x + 0.13f, y + 0.1f);
         rt.sizeDelta = Vector2.zero;
         rt.anchoredPosition = Vector2.zero;
 
         GameObject txtObj = new GameObject("Text");
         txtObj.transform.SetParent(btnObj.transform, false);
         Text txt = txtObj.AddComponent<Text>();
-        txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        txt.fontSize = 16;
-        txt.fontStyle = FontStyle.Bold;
+        Font fnafFont = Resources.Load<Font>("Fonts/fnaf");
+        if (fnafFont == null)
+            fnafFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        txt.font = fnafFont;
+        txt.fontSize = 28;
+        txt.fontStyle = FontStyle.Normal;
         txt.alignment = TextAnchor.MiddleCenter;
         txt.color = Color.white;
         txt.text = label;
