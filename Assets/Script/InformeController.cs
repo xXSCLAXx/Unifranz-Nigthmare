@@ -435,20 +435,17 @@ public class InformeController : MonoBehaviour
 
     IEnumerator LoadWarningClip()
     {
-        string path = "file:///" + Application.streamingAssetsPath + "/Audio/warning.wav";
-        using (WWW www = new WWW(path))
+        AudioClip clip = Resources.Load<AudioClip>("Audio/warning");
+        if (clip != null)
         {
-            yield return www;
-            if (string.IsNullOrEmpty(www.error))
+            warningClip = clip;
+            if (warningSource != null)
             {
-                warningClip = www.GetAudioClip(false, false, AudioType.WAV);
-                if (warningClip != null && warningSource != null)
-                {
-                    warningSource.clip = warningClip;
-                    warningSource.Play();
-                }
+                warningSource.clip = warningClip;
+                warningSource.Play();
             }
         }
+        yield break;
     }
 
     void CreateGlobalAlert()

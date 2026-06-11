@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Build.Reporting;
 using System.IO;
+using System.Linq;
 
 public class BuildSetup
 {
@@ -16,5 +18,44 @@ public class BuildSetup
         }
         EditorBuildSettings.scenes = scenes;
         Debug.Log("Added " + guids.Length + " scenes to Build Settings.");
+    }
+
+    [MenuItem("Build/Build Android APK")]
+    static void BuildAndroidAPK()
+    {
+        BuildAPK();
+    }
+
+    static void BuildAPK()
+    {
+        string[] scenes = EditorBuildSettings.scenes
+            .Where(s => s.enabled)
+            .Select(s => s.path)
+            .ToArray();
+
+        string outputPath = Path.Combine(Application.dataPath, "../Builds/FNaF-Panorama.apk");
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+
+        BuildPlayerOptions options = new BuildPlayerOptions
+        {
+            scenes = scenes,
+            locationPathName = outputPath,
+            target = BuildTarget.Android,
+            options = BuildOptions.None
+        };
+
+        BuildReport report = BuildPipeline.BuildPlayer(options);
+        BuildSummary summary = report.summary;
+
+        if (summary.result == BuildResult.Succeeded)
+        {
+            Debug.Log("APK built successfully: " + outputPath);
+            EditorUtility.RevealInFinder(outputPath);
+        }
+        else
+        {
+            Debug.LogError("Android build failed: " + summary.totalErrors + " errors.");
+            EditorApplication.Exit(1);
+        }
     }
 }

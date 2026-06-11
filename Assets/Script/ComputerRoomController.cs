@@ -108,14 +108,9 @@ public class ComputerRoomController : MonoBehaviour
 
         Image bg = panel.AddComponent<Image>();
         Sprite bgSprite = null;
-        string imgPath = Application.streamingAssetsPath + "/Texture/computer_room.png";
-        if (System.IO.File.Exists(imgPath))
-        {
-            byte[] bytes = System.IO.File.ReadAllBytes(imgPath);
-            Texture2D tex = new Texture2D(2, 2);
-            if (tex.LoadImage(bytes))
-                bgSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-        }
+        Texture2D tex = Resources.Load<Texture2D>("Texture/computer_room");
+        if (tex != null)
+            bgSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         if (bgSprite != null)
         {
             bg.sprite = bgSprite;
@@ -313,10 +308,10 @@ public class ComputerRoomController : MonoBehaviour
         GameObject bloodFilter = GameObject.Find("BloodFilter");
         if (bloodFilter != null) bloodFilter.SetActive(true);
 
-        string videoPath = Application.streamingAssetsPath + "/Video/pc4_screamer.mp4";
-        if (System.IO.File.Exists(videoPath))
+        VideoClip screamerClip = Resources.Load<VideoClip>("Video/pc4_screamer");
+        if (screamerClip != null)
         {
-            videoPlayer.url = videoPath;
+            videoPlayer.clip = screamerClip;
             videoPlayer.Play();
             Invoke("HideScreamer", 4f);
         }

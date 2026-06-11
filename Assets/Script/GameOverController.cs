@@ -48,14 +48,9 @@ public class GameOverController : MonoBehaviour
 
             Image bg = panel.AddComponent<Image>();
             Sprite bgSprite = null;
-            string imgPath = Application.streamingAssetsPath + "/Texture/gameover.png";
-            if (System.IO.File.Exists(imgPath))
-            {
-                byte[] bytes = System.IO.File.ReadAllBytes(imgPath);
-                Texture2D tex = new Texture2D(2, 2);
-                if (tex.LoadImage(bytes))
-                    bgSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-            }
+            Texture2D tex = Resources.Load<Texture2D>("Texture/gameover");
+            if (tex != null)
+                bgSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
             if (bgSprite != null)
             {
                 bg.sprite = bgSprite;
