@@ -56,11 +56,11 @@ public class MenuPrincipal : MonoBehaviour
         if (canvas == null) return;
 
         GameObject salirObj = GameObject.Find("BotonSalir");
-        float offsetY = -140f;
+        float offsetY = -170f;
         if (salirObj != null)
         {
             RectTransform salirRt = salirObj.GetComponent<RectTransform>();
-            offsetY = salirRt.anchoredPosition.y - 140f;
+            offsetY = salirRt.anchoredPosition.y - 170f;
         }
 
         GameObject btnObj = new GameObject("BtnInstructions");

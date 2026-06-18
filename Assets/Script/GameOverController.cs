@@ -82,24 +82,24 @@ public class GameOverController : MonoBehaviour
             if (fnafFont == null)
                 fnafFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
             info.font = fnafFont;
-            info.fontSize = 48;
+            info.fontSize = 36;
             info.fontStyle = FontStyle.Normal;
             info.alignment = TextAnchor.MiddleCenter;
             info.color = new Color(1f, 0.8f, 0.2f);
-            info.text = "GAME OVER\n\nTareas completadas: " + completed + " / " + total;
+            info.text = "Tareas completadas: " + completed + " / " + total;
             RectTransform iRt = infoObj.GetComponent<RectTransform>();
             iRt.anchorMin = new Vector2(0f, 0.5f);
             iRt.anchorMax = new Vector2(1f, 0.72f);
             iRt.sizeDelta = Vector2.zero;
             iRt.anchoredPosition = Vector2.zero;
 
-            CreateButton("BtnReintentar", "REINTENTAR", 0.4f, 0.35f, () =>
+            CreateButton("BtnReintentar", "REINTENTAR", 0.3f, 0.35f, () =>
             {
                 GameStateReset.ResetAll();
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             });
 
-            CreateButton("BtnSalir", "SALIR", 0.6f, 0.35f, () =>
+            CreateButton("BtnSalir", "SALIR", 0.7f, 0.35f, () =>
             {
 #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
@@ -129,8 +129,8 @@ public class GameOverController : MonoBehaviour
         Button btn = btnObj.AddComponent<Button>();
         btn.onClick.AddListener(action);
         RectTransform rt = btnObj.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(x - 0.13f, y);
-        rt.anchorMax = new Vector2(x + 0.13f, y + 0.1f);
+        rt.anchorMin = new Vector2(x - 0.1f, y);
+        rt.anchorMax = new Vector2(x + 0.1f, y + 0.1f);
         rt.sizeDelta = Vector2.zero;
         rt.anchoredPosition = Vector2.zero;
 

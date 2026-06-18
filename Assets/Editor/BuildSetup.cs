@@ -26,6 +26,45 @@ public class BuildSetup
         BuildAPK();
     }
 
+    [MenuItem("Build/Build Windows EXE")]
+    static void BuildWindowsEXE()
+    {
+        BuildWin();
+    }
+
+    static void BuildWin()
+    {
+        string[] scenes = EditorBuildSettings.scenes
+            .Where(s => s.enabled)
+            .Select(s => s.path)
+            .ToArray();
+
+        string outputPath = Path.Combine(Application.dataPath, "../Builds/FNaF-Panorama.exe");
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+
+        BuildPlayerOptions options = new BuildPlayerOptions
+        {
+            scenes = scenes,
+            locationPathName = outputPath,
+            target = BuildTarget.StandaloneWindows64,
+            options = BuildOptions.None
+        };
+
+        BuildReport report = BuildPipeline.BuildPlayer(options);
+        BuildSummary summary = report.summary;
+
+        if (summary.result == BuildResult.Succeeded)
+        {
+            Debug.Log("Windows build successful: " + outputPath);
+            EditorUtility.RevealInFinder(outputPath);
+        }
+        else
+        {
+            Debug.LogError("Windows build failed: " + summary.totalErrors + " errors.");
+            EditorApplication.Exit(1);
+        }
+    }
+
     static void BuildAPK()
     {
         string[] scenes = EditorBuildSettings.scenes
